@@ -1,0 +1,188 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>lfs-rl — a verifiable RL environment for systems-debugging agents</title>
+<meta name="description" content="An agent diagnoses and repairs a fault injected into a fully-built Linux system. The reward is a functional check run inside the repaired system, not a string match.">
+<style>
+  :root{
+    --paper:#fcfcfb; --panel:#ffffff; --ink:#1b1d21; --ink-soft:#474b54; --ink-faint:#868b95;
+    --accent:#39598a; --accent-soft:#eaf0f7; --pass:#2f7d4f; --rule:#e5e5e1; --code-bg:#f4f4f1;
+    --serif:Georgia,"Iowan Old Style","Palatino Linotype","Times New Roman",serif;
+    --sans:system-ui,-apple-system,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;
+    --mono:ui-monospace,"SF Mono",Menlo,Consolas,monospace;
+  }
+  @media (prefers-color-scheme:dark){:root{
+    --paper:#15171b; --panel:#1c1f25; --ink:#e4e6ea; --ink-soft:#a6abb4; --ink-faint:#6d727b;
+    --accent:#88a8d2; --accent-soft:#1e2733; --pass:#57b87e; --rule:#2a2e35; --code-bg:#1f2329;}}
+  *{box-sizing:border-box}
+  body{margin:0;background:var(--paper);color:var(--ink);font-family:var(--serif);
+    font-size:17.5px;line-height:1.72;-webkit-font-smoothing:antialiased}
+  .wrap{max-width:716px;margin:0 auto;padding:0 26px}
+  h1,h2,h3,.label,.meta,.eyebrow,th,.fig-label,.tag,code,.mono,.num,.badge{font-family:var(--sans)}
+  a{color:var(--accent);text-decoration:none;border-bottom:1px solid color-mix(in srgb,var(--accent) 35%,transparent)}
+  a:hover{border-bottom-color:var(--accent)}
+  code{font-family:var(--mono);font-size:.86em;background:var(--code-bg);padding:1px 5px;border-radius:4px}
+
+  header{padding:66px 0 0}
+  .eyebrow{font-size:12px;letter-spacing:.14em;text-transform:uppercase;color:var(--accent);font-weight:600;margin-bottom:20px}
+  h1{font-family:var(--serif);font-weight:600;font-size:clamp(27px,4vw,34px);line-height:1.25;margin:0 0 14px;letter-spacing:-.01em;text-wrap:balance}
+  .sub{font-size:18px;color:var(--ink-soft);margin:0 0 20px;line-height:1.5}
+  .meta{font-size:12.5px;color:var(--ink-faint);letter-spacing:.02em;padding-bottom:26px;border-bottom:1px solid var(--rule)}
+  .meta span{white-space:nowrap}
+  .meta i{font-style:normal;color:var(--rule);margin:0 8px}
+
+  .abstract{margin:30px 0 6px;padding:22px 24px;background:var(--panel);border:1px solid var(--rule);border-radius:6px}
+  .abstract .label{font-size:11.5px;letter-spacing:.12em;text-transform:uppercase;color:var(--ink-faint);font-weight:600;margin-bottom:8px}
+  .abstract p{margin:0;font-size:16.5px;line-height:1.66}
+
+  section{padding:34px 0 4px}
+  h2{font-family:var(--sans);font-size:20px;font-weight:650;margin:0 0 14px;letter-spacing:-.005em;
+    padding-bottom:9px;border-bottom:1px solid var(--rule)}
+  h2 .n{color:var(--accent);font-variant-numeric:tabular-nums;margin-right:12px;font-weight:600}
+  p{margin:0 0 15px}
+  strong{font-weight:600}
+  ul{margin:0 0 15px;padding-left:20px} li{margin:0 0 7px}
+
+  /* figures / tables */
+  figure{margin:22px 0;background:var(--panel);border:1px solid var(--rule);border-radius:6px;overflow:hidden}
+  .figbody{padding:20px 22px 6px}
+  figure svg{width:100%;height:auto;display:block}
+  figcaption,.tabcap{font-family:var(--sans);font-size:13px;color:var(--ink-soft);line-height:1.55;
+    padding:12px 22px;border-top:1px solid var(--rule);background:color-mix(in srgb,var(--accent-soft) 40%,transparent)}
+  .fig-label,.tab-label{font-weight:650;color:var(--ink)}
+  .tabwrap{overflow-x:auto}
+  table{border-collapse:collapse;width:100%;font-family:var(--sans);font-size:14.5px}
+  caption{caption-side:top;text-align:left;font-family:var(--sans);font-size:13px;color:var(--ink-soft);padding:0 0 10px}
+  caption b{color:var(--ink)}
+  th,td{text-align:left;padding:10px 14px;border-bottom:1px solid var(--rule)}
+  thead th{font-size:11.5px;letter-spacing:.06em;text-transform:uppercase;color:var(--ink-faint);font-weight:600}
+  .num{font-variant-numeric:tabular-nums;text-align:right}
+  tr.emph td{background:var(--accent-soft);font-weight:600}
+  .pass{color:var(--pass)}
+
+  .term{margin:20px 0;background:var(--panel);border:1px solid var(--rule);border-radius:6px;overflow:hidden}
+  .term-h{font-family:var(--sans);font-size:11.5px;color:var(--ink-faint);padding:8px 16px;border-bottom:1px solid var(--rule);letter-spacing:.03em}
+  .term-b{font-family:var(--mono);font-size:12.5px;line-height:1.9;padding:13px 16px;overflow-x:auto;color:var(--ink-soft)}
+  .term-b .l{white-space:pre}
+  .term-b .p{color:var(--accent)} .term-b .e{color:#b5482f} .term-b .g{color:var(--pass)} .term-b .c{color:var(--ink-faint)}
+  @media(prefers-color-scheme:dark){.term-b .e{color:#e07a5f}}
+
+  .avail{list-style:none;padding:0;margin:0}
+  .avail li{padding:9px 0;border-bottom:1px solid var(--rule);font-size:16px;display:flex;gap:14px}
+  .avail li:last-child{border-bottom:none}
+  .avail .k{font-family:var(--sans);font-size:12.5px;font-weight:600;color:var(--ink-faint);text-transform:uppercase;letter-spacing:.05em;flex:0 0 116px;padding-top:3px}
+
+  .close{margin:30px 0 4px;padding:22px 24px;background:var(--accent-soft);border:1px solid var(--rule);border-radius:6px}
+  .close p{margin:0}
+  footer{margin-top:40px;padding:22px 0 64px;border-top:1px solid var(--rule);font-family:var(--sans);font-size:12.5px;color:var(--ink-faint)}
+  @media(max-width:520px){.avail li{flex-direction:column;gap:2px}.avail .k{flex-basis:auto}}
+</style>
+</head>
+<body>
+
+<div class="wrap">
+  <header>
+    <div class="eyebrow">Technical summary</div>
+    <h1>lfs-rl: a verifiable RL environment for systems-debugging agents</h1>
+    <p class="sub">An agent diagnoses and repairs a fault injected into a fully-built Linux system. The reward is a functional check run inside the repaired system, not a string match.</p>
+    <div class="meta"><span>RLVR</span><i>·</i><span>reward-hack-resistant</span><i>·</i><span><code>verifiers</code>-compatible</span><i>·</i><span>50 fault instances</span><i>·</i><span>deterministic</span></div>
+  </header>
+
+  <div class="abstract">
+    <div class="label">Abstract</div>
+    <p>We describe lfs-rl, a reinforcement-learning environment in which an agent must diagnose and repair a fault injected into a fully-built Linux From Scratch system, using a shell and no hints. The reward is verifiable and designed to resist reward hacking: instead of comparing output text, an out-of-band verifier compiles and runs a program inside the repaired system and checks its behaviour. Using only the environment's own pipeline — a supervised warm-start followed by GRPO — we raise Qwen2.5-3B from a 0% to a 90% binary full-solve rate on held-out faults, for roughly $0.50 of compute. We include a difficulty calibration against a frontier model, which solves the current fault set in 8–11 commands; the environment is accordingly well suited to training and evaluating open models. It ships in the <code>verifiers</code> format, is deterministic, and runs without root or a VM.</p>
+  </div>
+
+  <section>
+    <h2><span class="n">1</span>Environment</h2>
+    <p>Each episode begins from a working Linux From Scratch (LFS) chroot and injects a single fault. The current set contains <strong>50 deterministic instances</strong> across five library packages and one cross-package target, spanning six fault classes: toolchain sabotage, silent filesystem failures, missing development files, cross-package breaks (where the package that fails is not the one that is broken), runtime-correctness faults (the library builds and runs but returns wrong data), and composites of the above. <code>sample_fault(seed)</code> maps a seed to a fixed instance, so runs are reproducible.</p>
+    <p>The agent receives a shell with passwordless sudo and no network access, and acts one command per turn. Episodes run in a rootless sandbox — user, mount, and PID namespaces over an overlay copy-on-write rootfs — at about <strong>1.6 seconds per episode</strong>, with no root privileges and no virtual machine. The throughput is what makes on-policy RL over real package builds practical.</p>
+    <div class="term">
+      <div class="term-h">Example episode — a cross-package fault (symptom in one package, cause in another)</div>
+      <div class="term-b">
+<div class="l"><span class="p">$</span> chroot /mnt/lfs make -C /sources/kmod-34.2</div>
+<div class="l"><span class="e">/usr/bin/ld: undefined reference to `gzread'</span>  <span class="c"># symptom: kmod won't link</span></div>
+<div class="l"><span class="p">$</span> ls -l /usr/lib/libz.so</div>
+<div class="l">libz.so -&gt; <span class="e">libbz2.so.1.0</span>  <span class="c"># cause: zlib's dev symlink is mispointed</span></div>
+<div class="l"><span class="p">$</span> ln -sf libz.so.1.3.1 /usr/lib/libz.so &amp;&amp; make &amp;&amp; make install</div>
+<div class="l"><span class="g">verifier: libkmod compiles, links, and runs — reward 1.0</span></div>
+      </div>
+    </div>
+  </section>
+
+  <section>
+    <h2><span class="n">2</span>Verifiable reward</h2>
+    <p>Scoring is performed out-of-band by a functional verifier. Inside the repaired system, a small canary program is compiled, executed, and its output compared against ground truth — for example, a compress/decompress round-trip that must return the original bytes, an XML parse, or a dynamic-linker resolution. The reward reflects whether the repair actually works, not whether the expected files are present.</p>
+    <p>The design is deliberately robust to reward hacking. A library stub that only reports the correct version string, while omitting real functionality, does not pass; we implemented that attack ourselves and confirmed every verifier rejects it. The environment exposes two reward signals: a dense shaped reward over intermediate milestones, suitable for RL from a weak base, and a binary reward used for evaluation.</p>
+  </section>
+
+  <section>
+    <h2><span class="n">3</span>Training result</h2>
+    <p>The environment's own pipeline is sufficient to train a competent policy. We apply a supervised warm-start on 111 verifier-passed reference trajectories, then run 9 rounds of GRPO from that checkpoint on 8 training seeds, none of which appear in the evaluation set. Total compute is a single GPU at $0.16/hour for a few hours. Table 1 reports the binary full-solve rate on held-out faults; Figure 1 shows the GRPO learning curve.</p>
+    <div class="tabwrap">
+      <table>
+        <caption><b>Table 1.</b> Held-out binary full-solve rate (the repaired system must run correctly, not merely build), Qwen2.5-3B.</caption>
+        <thead><tr><th>Policy</th><th class="num">Held-out full-solve</th></tr></thead>
+        <tbody>
+          <tr><td>Base model</td><td class="num">0 / 10</td></tr>
+          <tr><td>+ supervised warm-start</td><td class="num">3 / 10</td></tr>
+          <tr class="emph"><td>+ GRPO (final)</td><td class="num"><span class="pass">28 / 31 (90%)</span></td></tr>
+        </tbody>
+      </table>
+    </div>
+    <figure>
+      <div class="figbody">
+        <svg viewBox="0 0 720 190" preserveAspectRatio="none" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="GRPO learning curve: mean reward rises from 0.31 to 0.88 over nine rounds">
+          <line x1="46" y1="16" x2="46" y2="160" stroke="var(--rule)" stroke-width="1"/>
+          <line x1="46" y1="160" x2="702" y2="160" stroke="var(--rule)" stroke-width="1"/>
+          <text x="38" y="24" text-anchor="end" font-family="var(--mono)" font-size="10.5" fill="var(--ink-faint)">1.0</text>
+          <text x="38" y="163" text-anchor="end" font-family="var(--mono)" font-size="10.5" fill="var(--ink-faint)">0</text>
+          <polyline fill="none" stroke="var(--accent)" stroke-width="2" stroke-linejoin="round"
+            points="46,117 128,104 210,92 292,62 374,60 456,55 538,47 620,28 702,28"/>
+          <circle cx="46" cy="117" r="3" fill="var(--accent)"/><circle cx="702" cy="28" r="4" fill="var(--pass)"/>
+          <text x="52" y="112" font-family="var(--mono)" font-size="10" fill="var(--ink-faint)">0.31</text>
+          <text x="696" y="22" text-anchor="end" font-family="var(--mono)" font-size="10" fill="var(--pass)">0.88</text>
+        </svg>
+      </div>
+      <figcaption><span class="fig-label">Figure 1.</span> Mean shaped reward per GRPO round (nine rounds, then converged). Group counts fall over training as seeds saturate to uniform success.</figcaption>
+    </figure>
+    <p>Every single-fault type is solved after training, including toolchain sabotage. The policy also transfers to fault classes it never trained on, solving 4 of 4 composite instances and 3 of 4 cross-package instances. The remaining gap is the runtime-correctness class (0 of 2), which by construction leaves no build error to follow — the case the taxonomy was designed to make hardest. Before training, the base model could not enter the chroot at all.</p>
+  </section>
+
+  <section>
+    <h2><span class="n">4</span>Difficulty calibration</h2>
+    <p>To place the environment on a capability scale, we evaluated a frontier model (Claude) on progressively harder faults, each further from a self-documenting error message. It solved all of them in 8 to 11 commands, including the three hardest constructions we could design:</p>
+    <ul>
+      <li>silent wrong output with no build error;</li>
+      <li>a fault that a rebuild does not clear, because a preloaded shim intercepts the freshly-built library; and</li>
+      <li>a defect planted in the source tarball, with no clean copy available to compare against.</li>
+    </ul>
+    <p>We report this plainly: the current fault set is within the reach of a frontier model, so the environment's value today is in <strong>training and evaluating open models</strong>, where it produces a clear capability gradient — each of these faults is a wall for a small model while eliciting a multi-step diagnosis from a strong one. Whether single-package faults can be made frontier-hard is, on present evidence, an open question rather than a promise.</p>
+  </section>
+
+  <section>
+    <h2><span class="n">5</span>Integration and cost</h2>
+    <ul class="avail">
+      <li><span class="k">Format</span><span>Packaged as a <code>verifiers</code> environment (Prime Intellect's format) and validated end-to-end against a live model endpoint, in addition to the native harness.</span></li>
+      <li><span class="k">Determinism</span><span>Seed-to-instance mapping is fixed; the same seed reproduces the same fault and verifier.</span></li>
+      <li><span class="k">Footprint</span><span>Rootless sandbox, ~1.6 s/episode, ~200 MB per instance, no root or VM. A full training run cost about $0.50 of GPU.</span></li>
+      <li><span class="k">Included</span><span>The environment, the fault generator, the training pipeline (warm-start and GRPO), the trained adapters, and the calibration harness and data.</span></li>
+      <li><span class="k">Scaling</span><span>Mechanical: the generator is parameterised over packages and fault types, and adding a package yields about nine validated faults. Eight further library packages are already present in the source tree.</span></li>
+    </ul>
+  </section>
+
+  <section>
+    <h2><span class="n">6</span>Fit and availability</h2>
+    <p>lfs-rl is intended for teams and platforms that train or evaluate open models on agentic, coding, or operations tasks, and for RL-environment marketplaces that require verifiable, hard-to-game rewards and reproducible, drop-in environments. It satisfies those requirements directly: the reward is functional and resists gaming, the packaging is standard, and the training result is reproducible from the included pipeline.</p>
+    <div class="close">
+      <p>The full environment, pipeline, adapters, and calibration data are available for evaluation. We welcome a technical review and a conversation about the difficulty and scale targets that would make it useful to you.</p>
+    </div>
+  </section>
+
+  <footer>lfs-rl — an RLVR environment for systems-debugging agents. Results, per-class tables, and the calibration harness are included in the repository.</footer>
+</div>
+
+</body>
+</html>
