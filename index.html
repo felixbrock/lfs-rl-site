@@ -116,6 +116,7 @@
     <h2><span class="n">2</span>Verifiable reward</h2>
     <p>Scoring is performed out-of-band by a functional verifier. Inside the repaired system, a small canary program is compiled, executed, and its output compared against ground truth — for example, a compress/decompress round-trip that must return the original bytes, an XML parse, or a dynamic-linker resolution. The reward reflects whether the repair actually works, not whether the expected files are present.</p>
     <p>The design is deliberately robust to reward hacking. A library stub that only reports the correct version string, while omitting real functionality, does not pass; we implemented that attack ourselves and confirmed every verifier rejects it. The environment exposes two reward signals: a dense shaped reward over intermediate milestones, suitable for RL from a weak base, and a binary reward used for evaluation.</p>
+    <p>Verification scales with the fault set rather than gating it. Every package's verifier instantiates the same pattern — compile a canary, perform a real operation, compare against ground truth — so a new package requires only a small canary program; the fault classes, milestone reward, and hardening apply unchanged. An automated solvability check then proves each new fault both <strong>solvable</strong> (the reference fix passes the verifier) and <strong>biting</strong> (a naive rebuild does not) before it enters the set, so the set grows without accumulating broken or trivial tasks.</p>
   </section>
 
   <section>
@@ -169,7 +170,7 @@
       <li><span class="k">Determinism</span><span>Seed-to-instance mapping is fixed; the same seed reproduces the same fault and verifier.</span></li>
       <li><span class="k">Footprint</span><span>Rootless sandbox, ~1.6 s/episode, ~200 MB per instance, no root or VM. A full training run cost about $0.50 of GPU.</span></li>
       <li><span class="k">Included</span><span>The environment, the fault generator, the training pipeline (warm-start and GRPO), the trained adapters, and the calibration harness and data.</span></li>
-      <li><span class="k">Scaling</span><span>Mechanical: the generator is parameterised over packages and fault types, and adding a package yields about nine validated faults. Eight further library packages are already present in the source tree.</span></li>
+      <li><span class="k">Scaling</span><span>Mechanical, verification included: the generator is parameterised over packages and fault types, and each package's verifier is an instance of one canary pattern. The most recent package addition (zstd) consisted of a 56-line verifier and one taxonomy entry, and yielded nine new faults, each automatically proven solvable and biting by CI. Eight further library packages are already staged in the source tree.</span></li>
     </ul>
   </section>
 
