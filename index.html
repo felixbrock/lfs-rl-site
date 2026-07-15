@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
-<title>lfs-rl — a verifiable RL environment for systems-debugging agents</title>
+<title>lfs-rl, a verifiable RL environment for systems-debugging agents</title>
 <meta name="description" content="An agent diagnoses and repairs a fault injected into a fully-built Linux system. The reward is a functional check run inside the repaired system, not a string match.">
 <style>
   :root{
@@ -85,43 +85,43 @@
 <div class="wrap">
   <header>
     <div class="eyebrow">Technical summary</div>
-    <h1>lfs-rl: a verifiable RL environment for systems-debugging agents</h1>
+    <h1>lfs-rl, a verifiable RL environment for systems-debugging agents</h1>
     <p class="sub">An agent diagnoses and repairs a fault injected into a fully-built Linux system. The reward is a functional check run inside the repaired system, not a string match.</p>
     <div class="meta"><span>RLVR</span><i>·</i><span>reward-hack-resistant</span><i>·</i><span><code>verifiers</code>-compatible</span><i>·</i><span>50 fault instances</span><i>·</i><span>deterministic</span></div>
   </header>
 
   <div class="abstract">
     <div class="label">Abstract</div>
-    <p>We describe lfs-rl, a reinforcement-learning environment in which an agent must diagnose and repair a fault injected into a fully-built Linux From Scratch system, using a shell and no hints. The reward is verifiable and designed to resist reward hacking: instead of comparing output text, an out-of-band verifier compiles and runs a program inside the repaired system and checks its behaviour. Using only the environment's own pipeline — a supervised warm-start followed by GRPO — we take Qwen2.5-3B from 0% to a 90% binary full-solve rate across its 13 training fault types, each solve a genuine, functionally-verified repair, for roughly $0.50 of compute. Holdouts added after training — an unseen package, and unseen fault classes on a trained package — then measure 0% transfer on both axes: the environment cleanly separates procedural mastery from genuine diagnosis, and we report the full matrix. A frontier model solves the full fault set zero-shot in 8–11 commands, giving the capability gradient a measured span. It ships in the <code>verifiers</code> format, is deterministic, and runs without root or a VM.</p>
+    <p>We describe lfs-rl, a reinforcement-learning environment in which an agent must diagnose and repair a fault injected into a fully-built Linux From Scratch system, using a shell and no hints. The reward is verifiable and designed to resist reward hacking. Instead of comparing output text, an out-of-band verifier compiles and runs a program inside the repaired system and checks its behaviour. Using only the environment's own pipeline, a supervised warm-start followed by GRPO, we take Qwen2.5-3B from 0% to a 90% binary full-solve rate across its 13 training fault types, each solve a genuine, functionally-verified repair, for roughly $0.50 of compute. Holdouts added after training, an unseen package and unseen fault classes on a trained package, then measure 0% transfer on both axes. The environment cleanly separates procedural mastery from genuine diagnosis, and we report the full matrix. A frontier model solves the full fault set zero-shot in 8 to 11 commands, giving the capability gradient a measured span. It ships in the <code>verifiers</code> format, is deterministic, and runs without root or a VM.</p>
   </div>
 
   <section>
     <h2><span class="n">1</span>Environment</h2>
-    <p>Each episode begins from a working Linux From Scratch (LFS) chroot and injects a single fault. The current set contains <strong>50 deterministic instances</strong> across five library packages and one cross-package target, spanning six fault classes: toolchain sabotage, silent filesystem failures, missing development files, cross-package breaks (where the package that fails is not the one that is broken), runtime-correctness faults (the library builds and runs but returns wrong data), and composites of the above. <code>sample_fault(seed)</code> maps a seed to a fixed instance, so runs are reproducible.</p>
-    <p>The agent receives a shell with passwordless sudo and no network access, and acts one command per turn. Episodes run in a rootless sandbox — user, mount, and PID namespaces over an overlay copy-on-write rootfs — at about <strong>1.6 seconds per episode</strong>, with no root privileges and no virtual machine. The throughput is what makes on-policy RL over real package builds practical.</p>
+    <p>Each episode begins from a working Linux From Scratch (LFS) chroot and injects a single fault. The current set contains <strong>50 deterministic instances</strong> across five library packages and one cross-package target, spanning six fault classes. These are toolchain sabotage, silent filesystem failures, missing development files, cross-package breaks (where the package that fails is not the one that is broken), runtime-correctness faults (the library builds and runs but returns wrong data), and composites of the above. <code>sample_fault(seed)</code> maps a seed to a fixed instance, so runs are reproducible.</p>
+    <p>The agent receives a shell with passwordless sudo and no network access, and acts one command per turn. Episodes run in a rootless sandbox (user, mount, and PID namespaces over an overlay copy-on-write rootfs) at about <strong>1.6 seconds per episode</strong>, with no root privileges and no virtual machine. The throughput is what makes on-policy RL over real package builds practical.</p>
     <div class="term">
-      <div class="term-h">Example episode — a cross-package fault (symptom in one package, cause in another)</div>
+      <div class="term-h">Example episode. A cross-package fault (symptom in one package, cause in another)</div>
       <div class="term-b">
 <div class="l"><span class="p">$</span> chroot /mnt/lfs make -C /sources/kmod-34.2</div>
 <div class="l"><span class="e">/usr/bin/ld: undefined reference to `gzread'</span>  <span class="c"># symptom: kmod won't link</span></div>
 <div class="l"><span class="p">$</span> ls -l /usr/lib/libz.so</div>
 <div class="l">libz.so -&gt; <span class="e">libbz2.so.1.0</span>  <span class="c"># cause: zlib's dev symlink is mispointed</span></div>
 <div class="l"><span class="p">$</span> ln -sf libz.so.1.3.1 /usr/lib/libz.so &amp;&amp; make &amp;&amp; make install</div>
-<div class="l"><span class="g">verifier: libkmod compiles, links, and runs — reward 1.0</span></div>
+<div class="l"><span class="g">verifier: libkmod compiles, links, and runs (reward 1.0)</span></div>
       </div>
     </div>
   </section>
 
   <section>
     <h2><span class="n">2</span>Verifiable reward</h2>
-    <p>Scoring is performed out-of-band by a functional verifier. Inside the repaired system, a small canary program is compiled, executed, and its output compared against ground truth — for example, a compress/decompress round-trip that must return the original bytes, an XML parse, or a dynamic-linker resolution. The reward reflects whether the repair actually works, not whether the expected files are present.</p>
-    <p>The design is deliberately robust to reward hacking. A library stub that only reports the correct version string, while omitting real functionality, does not pass; we implemented that attack ourselves and confirmed every verifier rejects it. The environment exposes two reward signals: a dense shaped reward over intermediate milestones, suitable for RL from a weak base, and a binary reward used for evaluation.</p>
-    <p>Verification scales with the fault set rather than gating it. Every package's verifier instantiates the same pattern — compile a canary, perform a real operation, compare against ground truth — so a new package requires only a small canary program; the fault classes, milestone reward, and hardening apply unchanged. An automated solvability check then proves each new fault both <strong>solvable</strong> (the reference fix passes the verifier) and <strong>biting</strong> (a naive rebuild does not) before it enters the set, so the set grows without accumulating broken or trivial tasks.</p>
+    <p>Scoring is performed out-of-band by a functional verifier. Inside the repaired system, a small canary program is compiled, executed, and its output compared against ground truth, for example a compress/decompress round-trip that must return the original bytes, an XML parse, or a dynamic-linker resolution. The reward reflects whether the repair actually works, not whether the expected files are present.</p>
+    <p>The design is deliberately robust to reward hacking. A library stub that only reports the correct version string, while omitting real functionality, does not pass; we implemented that attack ourselves and confirmed every verifier rejects it. The environment exposes two reward signals. A dense shaped reward over intermediate milestones gives even a weak base policy gradient, and a binary reward is used for evaluation.</p>
+    <p>Verification scales with the fault set rather than gating it. Every package's verifier instantiates the same pattern (compile a canary, perform a real operation, compare the output against ground truth), so a new package requires only a small canary program; the fault classes, milestone reward, and hardening apply unchanged. An automated solvability check then proves each new fault both <strong>solvable</strong> (the reference fix passes the verifier) and <strong>biting</strong> (a naive rebuild does not) before it enters the set, so the set grows without accumulating broken or trivial tasks.</p>
   </section>
 
   <section>
     <h2><span class="n">3</span>Training result</h2>
-    <p>The environment's own pipeline is sufficient to train a small model from zero capability to reliable execution of the trained repairs. We apply a supervised warm-start on 111 verifier-passed reference trajectories covering every fault type, then run 9 rounds of GRPO from that checkpoint on 8 seeds drawn from three single-fault classes. Total compute is a single GPU at $0.16/hour for a few hours. We state precisely what the evaluation measures: instances are deterministic and the warm-start demonstrates each fault type, so Table 1 reports <strong>training-distribution mastery</strong> — the warm-start teaches the repairs but executes them unreliably (3/10 even on demonstrated tasks); GRPO consolidates them into 90% reliable, verifier-passing repairs, executed end-to-end at sampling temperature. Figure 1 shows the learning curve.</p>
+    <p>The environment's own pipeline is sufficient to train a small model from zero capability to reliable execution of the trained repairs. We apply a supervised warm-start on 111 verifier-passed reference trajectories covering every fault type, then run 9 rounds of GRPO from that checkpoint on 8 seeds drawn from three single-fault classes. Total compute is a single GPU at $0.16/hour for a few hours. We state precisely what the evaluation measures. Instances are deterministic and the warm-start demonstrates each fault type, so Table 1 reports <strong>training-distribution mastery</strong>. The warm-start teaches the repairs but executes them unreliably (3/10 even on demonstrated tasks); GRPO consolidates them into 90% reliable, verifier-passing repairs, executed end-to-end at sampling temperature. Figure 1 shows the learning curve.</p>
     <div class="tabwrap">
       <table>
         <caption><b>Table 1.</b> Binary full-solve rate across the 13 trained fault types (the repaired system must run correctly, not merely build), Qwen2.5-3B.</caption>
@@ -135,7 +135,7 @@
     </div>
     <figure>
       <div class="figbody">
-        <svg viewBox="0 0 720 190" preserveAspectRatio="none" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="GRPO learning curve: mean reward rises from 0.31 to 0.88 over nine rounds">
+        <svg viewBox="0 0 720 190" preserveAspectRatio="none" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="GRPO learning curve, mean reward rises from 0.31 to 0.88 over nine rounds">
           <line x1="46" y1="16" x2="46" y2="160" stroke="var(--rule)" stroke-width="1"/>
           <line x1="46" y1="160" x2="702" y2="160" stroke="var(--rule)" stroke-width="1"/>
           <text x="38" y="24" text-anchor="end" font-family="var(--mono)" font-size="10.5" fill="var(--ink-faint)">1.0</text>
@@ -149,30 +149,30 @@
       </div>
       <figcaption><span class="fig-label">Figure 1.</span> Mean shaped reward per GRPO round (nine rounds, then converged). Group counts fall over training as seeds saturate to uniform success.</figcaption>
     </figure>
-    <p>Every single-fault type is solved after training, including toolchain sabotage; composites reach 4 of 4 and cross-package faults 3 of 4. Runtime-correctness stays at 0 of 2 even with demonstrations in the warm-start data — the class that by construction leaves no build error to follow. Before training, the base model could not enter the chroot at all.</p>
-    <p><strong>Generalization, measured rather than assumed.</strong> To separate procedural mastery from genuine diagnostic capability, we held out along both axes: a fifth package (zstd) added to the taxonomy <em>after</em> both training stages, and two fault classes on a <em>trained</em> package (zlib preload-hijack and source-tamper, both constructed so that a rebuild does not clear the fault). Neither appears in any training trajectory. Table 2 reports the trained policy on every cell, three episodes per fault:</p>
+    <p>Every single-fault type is solved after training, including toolchain sabotage; composites reach 4 of 4 and cross-package faults 3 of 4. Runtime-correctness, the class that by construction leaves no build error to follow, stays at 0 of 2 even with demonstrations in the warm-start data. Before training, the base model could not enter the chroot at all.</p>
+    <p><strong>Generalization, measured rather than assumed.</strong> To separate procedural mastery from genuine diagnostic capability, we held out along both axes. The first holdout is a fifth package (zstd) added to the taxonomy <em>after</em> both training stages; the second is two fault classes on a <em>trained</em> package (zlib preload-hijack and source-tamper, both constructed so that a rebuild does not clear the fault). Neither appears in any training trajectory. Table 2 reports the trained policy on every cell, three episodes per fault.</p>
     <div class="tabwrap">
       <table>
         <caption><b>Table 2.</b> Generalization matrix, trained policy (warm-start + GRPO). Shaped reward tracks intermediate milestones; full-solve requires the functional verifier to pass. For reference, the base model scores 0 with shaped 0.011 on the zstd row, and a frontier model solves every cell zero-shot.</caption>
         <thead><tr><th></th><th class="num">Demonstrated fault types</th><th class="num">Unseen fault types</th></tr></thead>
         <tbody>
           <tr><td>Trained packages</td><td class="num"><span class="pass">28 / 31 (90%)</span></td><td class="num">0 / 6 <span style="color:var(--ink-faint)">· shaped 0.75</span></td></tr>
-          <tr><td>Unseen package (zstd)</td><td class="num">0 / 18 <span style="color:var(--ink-faint)">· shaped 0.06</span></td><td class="num">— <span style="color:var(--ink-faint)">not yet constructed</span></td></tr>
+          <tr><td>Unseen package (zstd)</td><td class="num">0 / 18 <span style="color:var(--ink-faint)">· shaped 0.06</span></td><td class="num"><span style="color:var(--ink-faint)">not yet constructed</span></td></tr>
         </tbody>
       </table>
     </div>
-    <p>The shaped rewards diagnose the failure modes precisely. On the unseen package (shaped 0.06) the policy cannot even execute its procedure: it applies repairs for faults that are not present and uses another package's build recipe. On the trained package with an unseen fault (shaped 0.75, uniformly across episodes) the procedure executes <em>flawlessly</em> — the rebuild succeeds and every intermediate milestone passes — but the fault survives it, and the policy never checks its own repair before declaring completion. Stated plainly, what this recipe produced is a <strong>reliable executor of demonstrated repair procedures, not a debugger</strong>: it has the procedure but not the loop — no verification of its own fix, no diagnosis when the fix is not enough. One caveat: the unseen fault types are hard-tier by construction, so that cell conflates novelty with difficulty; a frontier model solves both in ~9 commands. The environment measures this whole matrix directly, and closing it — multi-package curricula, colder task prompts, larger policies — is the open training question the generator's cheap package scaling exists to serve.</p>
+    <p>The shaped rewards diagnose the failure modes precisely. On the unseen package (shaped 0.06) the policy cannot even execute its procedure. It applies repairs for faults that are not present and uses another package's build recipe. On the trained package with an unseen fault (shaped 0.75, uniformly across episodes) the procedure executes <em>flawlessly</em>. The rebuild succeeds and every intermediate milestone passes, but the fault survives it, and the policy never checks its own repair before declaring completion. Stated plainly, what this recipe produced is a <strong>reliable executor of demonstrated repair procedures, not a debugger</strong>. It has the procedure but not the loop, with no verification of its own fix and no diagnosis when the fix is not enough. One caveat is that the unseen fault types are hard-tier by construction, so that cell conflates novelty with difficulty; a frontier model solves both in ~9 commands. The environment measures this whole matrix directly, and closing it (multi-package curricula, colder task prompts, larger policies) is the open training question the generator's cheap package scaling exists to serve.</p>
   </section>
 
   <section>
     <h2><span class="n">4</span>Difficulty calibration</h2>
-    <p>To place the environment on a capability scale, we evaluated a frontier model (Claude) on progressively harder faults, each further from a self-documenting error message. It solved all of them in 8 to 11 commands, including the three hardest constructions we could design:</p>
+    <p>To place the environment on a capability scale, we evaluated a frontier model (Claude) on progressively harder faults, each further from a self-documenting error message. It solved all of them in 8 to 11 commands, including the three hardest constructions we could design.</p>
     <ul>
       <li>silent wrong output with no build error;</li>
       <li>a fault that a rebuild does not clear, because a preloaded shim intercepts the freshly-built library; and</li>
       <li>a defect planted in the source tarball, with no clean copy available to compare against.</li>
     </ul>
-    <p>We report this plainly: the current fault set is within the reach of a frontier model, so the environment's value today is in <strong>training and evaluating open models</strong>, where it produces a capability gradient that Section 3 measures at both ends — 100% zero-shot for the frontier model, 0% for a trained 3B on a never-seen package, with every rung between them (base, warm-start, RL-consolidated) resolved. Whether single-package faults can be made frontier-hard is, on present evidence, an open question rather than a promise.</p>
+    <p>We report this plainly. The current fault set is within the reach of a frontier model, so the environment's value today is in <strong>training and evaluating open models</strong>, where it produces a capability gradient that Section 3 measures at both ends, 100% zero-shot for the frontier model and 0% for a trained 3B on a never-seen package, with every rung between them (base, warm-start, RL-consolidated) resolved. Whether single-package faults can be made frontier-hard is, on present evidence, an open question rather than a promise.</p>
   </section>
 
   <section>
@@ -182,19 +182,19 @@
       <li><span class="k">Determinism</span><span>Seed-to-instance mapping is fixed; the same seed reproduces the same fault and verifier.</span></li>
       <li><span class="k">Footprint</span><span>Rootless sandbox, ~1.6 s/episode, ~200 MB per instance, no root or VM. A full training run cost about $0.50 of GPU.</span></li>
       <li><span class="k">Included</span><span>The environment, the fault generator, the training pipeline (warm-start and GRPO), the trained adapters, and the calibration harness and data.</span></li>
-      <li><span class="k">Scaling</span><span>Mechanical, verification included: the generator is parameterised over packages and fault types, and each package's verifier is an instance of one canary pattern. The most recent package addition (zstd) consisted of a 56-line verifier and one taxonomy entry, and yielded nine new faults, each automatically proven solvable and biting by CI. Eight further library packages are already staged in the source tree.</span></li>
+      <li><span class="k">Scaling</span><span>Mechanical, verification included. The generator is parameterised over packages and fault types, and each package's verifier is an instance of one canary pattern. The most recent package addition (zstd) consisted of a 56-line verifier and one taxonomy entry, and yielded nine new faults, each automatically proven solvable and biting by CI. Eight further library packages are already staged in the source tree.</span></li>
     </ul>
   </section>
 
   <section>
     <h2><span class="n">6</span>Fit and availability</h2>
-    <p>lfs-rl is intended for teams and platforms that train or evaluate open models on agentic, coding, or operations tasks, and for RL-environment marketplaces that require verifiable, hard-to-game rewards and reproducible, drop-in environments. It satisfies those requirements directly: the reward is functional and resists gaming, the packaging is standard, and the training result is reproducible from the included pipeline.</p>
+    <p>lfs-rl is intended for teams and platforms that train or evaluate open models on agentic, coding, or operations tasks, and for RL-environment marketplaces that require verifiable, hard-to-game rewards and reproducible, drop-in environments. It satisfies those requirements directly. The reward is functional and resists gaming, the packaging is standard, and the training result is reproducible from the included pipeline.</p>
     <div class="close">
       <p>The full environment, pipeline, adapters, and calibration data are available for evaluation. We welcome a technical review and a conversation about the difficulty and scale targets that would make it useful to you.</p>
     </div>
   </section>
 
-  <footer>lfs-rl — an RLVR environment for systems-debugging agents. Results, per-class tables, and the calibration harness are included in the repository.</footer>
+  <footer>lfs-rl, an RLVR environment for systems-debugging agents. Results, per-class tables, and the calibration harness are included in the repository.</footer>
 </div>
 
 </body>
