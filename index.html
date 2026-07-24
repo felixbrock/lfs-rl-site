@@ -87,7 +87,7 @@
     <div class="eyebrow">Technical summary</div>
     <h1>lfs-rl, a verifiable RL environment for systems-debugging agents</h1>
     <p class="sub">An agent diagnoses and repairs a fault injected into a fully-built Linux system. The reward is a functional check run inside the repaired system, not a string match.</p>
-    <div class="meta"><span>RLVR</span><i>·</i><span>reward-hack-resistant</span><i>·</i><span><code>verifiers</code>-compatible</span><i>·</i><span>50 fault instances</span><i>·</i><span>deterministic</span></div>
+    <div class="meta"><span>RLVR</span><i>·</i><span>reward-hack-resistant</span><i>·</i><span><code>verifiers</code>-compatible</span><i>·</i><span>74 fault instances</span><i>·</i><span>deterministic</span></div>
   </header>
 
   <div class="abstract">
@@ -97,7 +97,7 @@
 
   <section>
     <h2><span class="n">1</span>Environment</h2>
-    <p>Each episode begins from a working Linux From Scratch (LFS) chroot with a single injected fault. The set contains <strong>50 deterministic instances</strong> across five library packages and six fault classes, from toolchain sabotage and cross-package breaks to runtime-correctness faults where the library builds but returns wrong data. The agent gets a shell with sudo and no network, one command per turn. Episodes run in a rootless sandbox at about <strong>1.6 seconds each</strong>, which makes on-policy RL over real package builds practical.</p>
+    <p>Each episode begins from a working Linux From Scratch (LFS) chroot with a single injected fault. The set contains <strong>74 deterministic instances</strong> across five library packages and a broad fault taxonomy, from toolchain sabotage and cross-package breaks to runtime-correctness faults where the library builds but returns wrong data. A distinct tranche models <strong>realistic operational failure modes in which the evidence lies</strong>, a header quietly shadowed by a stale one, a <code>make</code> that is secretly a dry run and writes nothing while exiting 0, a downloaded tarball that is really a saved error page, a library that keeps winning at load time after a clean rebuild. In these the error blames the wrong thing, so the agent must genuinely diagnose rather than pattern-match a known repair. The agent gets a shell with sudo and no network, one command per turn. Episodes run in a rootless sandbox at about <strong>1.6 seconds each</strong>, which makes on-policy RL over real package builds practical.</p>
     <div class="term">
       <div class="term-h">Example episode. A cross-package fault (symptom in one package, cause in another)</div>
       <div class="term-b">
@@ -142,11 +142,12 @@
       </table>
     </div>
     <p>The shaped rewards diagnose the failure modes. On the unseen package (shaped 0.06) the policy cannot even execute its procedure. On the trained package with an unseen fault (shaped 0.75) the procedure executes flawlessly, but the fault survives the rebuild and the policy never checks its own repair. This recipe produced a <strong>reliable executor of demonstrated repair procedures, not a debugger</strong>. Closing that gap is the open training question the generator's cheap package scaling exists to serve.</p>
+    <p><strong>The direct test is built.</strong> To ask whether a <em>diverse</em> curriculum, many mechanisms across many packages including the evidence-lies tranche, pushes the policy from procedure-replay toward diagnosis, the environment now defines a held-out matrix over unseen fault type, unseen package, and unseen composite, addressed by name so a held-out seed cannot leak a trained task. The plumbing is validated end-to-end and the controls are in hand, an oracle ceiling of 39/39 and a base-model floor of 0/13 bracketing every cell. The training run itself is the open next step.</p>
   </section>
 
   <section>
     <h2><span class="n">4</span>Difficulty calibration</h2>
-    <p>A frontier model (Claude) solved every fault we could construct in 8 to 11 commands, including silent wrong output with no build error, a fault a rebuild does not clear, and a defect planted in the source tarball. The current set is within frontier reach, so the environment's value today is in <strong>training and evaluating open models</strong>, where it resolves every rung of the capability gradient from 0% to 100%.</p>
+    <p>A frontier model (Claude) solved every fault we could construct, including silent wrong output with no build error, a fault a rebuild does not clear, and a defect planted in the source tarball. On the earlier tiers it took 8 to 11 commands; the evidence-lies tranche pushes deeper, still solved at pass@1 but in <strong>8 to 20 commands</strong>, since whole families of hypotheses must be eliminated when the error blames the wrong thing. The current set is within frontier reach, so the environment's value today is in <strong>training and evaluating open models</strong>, where it resolves every rung of the capability gradient from 0% to 100%.</p>
   </section>
 
   <section>
@@ -155,8 +156,9 @@
       <li><span class="k">Format</span><span>Packaged as a <code>verifiers</code> environment and validated end-to-end against a live model endpoint.</span></li>
       <li><span class="k">Determinism</span><span>The same seed reproduces the same fault and verifier.</span></li>
       <li><span class="k">Footprint</span><span>Rootless sandbox, ~1.6 s/episode, ~200 MB per instance. A full training run cost about $0.50 of GPU.</span></li>
-      <li><span class="k">Included</span><span>The environment, fault generator, training pipeline, trained adapters, and calibration harness.</span></li>
-      <li><span class="k">Scaling</span><span>Adding zstd took a 56-line verifier and one taxonomy entry, and yielded nine new faults, each proven solvable and biting by CI. Eight further packages are staged.</span></li>
+      <li><span class="k">Isolation</span><span>The sandbox runs untrusted, agent-generated shell. Its filesystem view is allow-list, only the directories a build needs are kept and everything else on the host is shadowed, with a private loopback-only network. Verified by writing a marker into every host path from inside and confirming none reached the host.</span></li>
+      <li><span class="k">Included</span><span>The environment, fault generator, end-to-end training pipeline and recipe (which reproduces the results above), and the calibration harness.</span></li>
+      <li><span class="k">Scaling</span><span>Faults are parameterised over the package, so each new library reuses the whole taxonomy for a small verifier and one entry; the set has grown to <strong>74 faults, each proven solvable and biting</strong> by CI. Further packages are staged.</span></li>
     </ul>
   </section>
 
@@ -164,7 +166,7 @@
     <h2><span class="n">6</span>Fit and availability</h2>
     <p>lfs-rl is intended for teams and platforms that train or evaluate open models on agentic, coding, or operations tasks, and for RL-environment marketplaces that require verifiable, hard-to-game rewards.</p>
     <div class="close">
-      <p>The full environment, pipeline, adapters, and calibration data are available for evaluation. We welcome a technical review.</p>
+      <p>The full environment, training pipeline, and calibration data are available for evaluation. We welcome a technical review.</p>
     </div>
   </section>
 
