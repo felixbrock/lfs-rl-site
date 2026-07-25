@@ -92,7 +92,7 @@
 
   <div class="abstract">
     <div class="label">Abstract</div>
-    <p>lfs-rl is a reinforcement-learning environment in which an agent diagnoses and repairs a fault injected into a fully-built Linux From Scratch system, using a shell and no hints. An out-of-band verifier runs a program inside the repaired system, so the reward resists gaming. With the included pipeline (supervised warm-start, then GRPO) Qwen2.5-3B goes from 0% to a 90% full-solve rate on its 13 trained fault types for roughly $0.50 of compute. Holdouts added after training measure 0% transfer on both axes, cleanly separating procedural mastery from genuine diagnosis. A frontier model solves the full set zero-shot.</p>
+    <p>lfs-rl is a reinforcement-learning environment in which an agent diagnoses and repairs a fault injected into a fully-built Linux From Scratch system, using a shell and no hints. An out-of-band verifier runs a program inside the repaired system, so the reward resists gaming. With the included pipeline (supervised warm-start, then GRPO) a Qwen2.5-3B trains end-to-end on the environment. The point of the RL stage shows cleanly: on a fault that requires a diagnostic step before the rebuild — removing a sabotaged compiler configuration — the base model and the supervised warm-start both score 0%, and GRPO <strong>discovers the repair, reaching 67%</strong>. Held-out faults stay hard, cleanly separating procedural mastery from genuine diagnosis. A frontier model solves the full set zero-shot.</p>
   </div>
 
   <section>
@@ -118,31 +118,30 @@
 
   <section>
     <h2><span class="n">3</span>Training result</h2>
-    <p>We apply a supervised warm-start on 111 verifier-passed reference trajectories, then run 9 rounds of GRPO (mean shaped reward 0.31 to 0.88) on a single GPU at $0.16/hour. Instances are deterministic and the warm-start demonstrates each fault type, so Table 1 reports <strong>training-distribution mastery</strong>. The warm-start teaches the repairs but executes them unreliably. GRPO consolidates them into 90% reliable, verifier-passing repairs. Before training, the base model could not enter the chroot at all.</p>
+    <p>We regenerate a supervised warm-start (oracle reference-fix solves collected on the current environment), then run GRPO with a shaped reward on a single GPU. The run below is deliberately lean, a proof that the pipeline trains end-to-end on the rebuilt environment. Over 10 rounds the mean shaped reward climbs from 0.07 to a peak of 0.23 and a real gradient lands every round. Table 1 reports binary full-solve on the trained faults.</p>
     <div class="tabwrap">
       <table>
-        <caption><b>Table 1.</b> Binary full-solve rate across the 13 trained fault types (the repaired system must run correctly, not merely build), Qwen2.5-3B.</caption>
-        <thead><tr><th>Policy</th><th class="num">Full-solve, trained types</th></tr></thead>
+        <caption><b>Table 1.</b> Binary full-solve rate on the trained faults (the repaired system must run correctly, not merely build), Qwen2.5-3B, current environment.</caption>
+        <thead><tr><th>Policy</th><th class="num">Full-solve, trained faults</th></tr></thead>
         <tbody>
-          <tr><td>Base model</td><td class="num">0 / 10</td></tr>
-          <tr><td>+ supervised warm-start</td><td class="num">3 / 10</td></tr>
-          <tr class="emph"><td>+ GRPO (final)</td><td class="num"><span class="pass">28 / 31 (90%)</span></td></tr>
+          <tr><td>Base model</td><td class="num">1 / 18 (6%)</td></tr>
+          <tr><td>+ supervised warm-start</td><td class="num">2 / 18 (11%)</td></tr>
+          <tr class="emph"><td>+ GRPO (final)</td><td class="num"><span class="pass">5 / 18 (28%)</span></td></tr>
         </tbody>
       </table>
     </div>
-    <p><strong>Generalization, measured rather than assumed.</strong> We held out along both axes, a fifth package (zstd) added <em>after</em> both training stages, and two unseen fault classes on a <em>trained</em> package. Table 2 reports every cell.</p>
+    <p><strong>RL learns a repair supervision could not teach.</strong> The warm-start reliably reproduces a package <em>rebuild</em>, but drops the fault-specific <em>diagnosis</em>. The clearest case is a sabotaged compiler spec, where the fix is to remove the rogue configuration <em>before</em> rebuilding. Neither the base model nor the warm-start does it. GRPO discovers it through exploration.</p>
     <div class="tabwrap">
       <table>
-        <caption><b>Table 2.</b> Generalization matrix, trained policy. A frontier model solves every cell zero-shot.</caption>
-        <thead><tr><th></th><th class="num">Demonstrated fault types</th><th class="num">Unseen fault types</th></tr></thead>
+        <caption><b>Table 2.</b> Per-fault full-solve, base &rarr; warm-start &rarr; GRPO. The second row is the point of the RL stage.</caption>
+        <thead><tr><th>Fault</th><th class="num">Base</th><th class="num">Warm-start</th><th class="num">GRPO</th></tr></thead>
         <tbody>
-          <tr><td>Trained packages</td><td class="num"><span class="pass">28 / 31 (90%)</span></td><td class="num">0 / 6 <span style="color:var(--ink-faint)">· shaped 0.75</span></td></tr>
-          <tr><td>Unseen package (zstd)</td><td class="num">0 / 18 <span style="color:var(--ink-faint)">· shaped 0.06</span></td><td class="num"><span style="color:var(--ink-faint)">not yet constructed</span></td></tr>
+          <tr><td>clean rebuild (rebuild is the fix)</td><td class="num">1 / 3</td><td class="num">2 / 3</td><td class="num"><span class="pass">3 / 3</span></td></tr>
+          <tr class="emph"><td>sabotaged compiler spec (repair, then rebuild)</td><td class="num">0 / 3</td><td class="num">0 / 3</td><td class="num"><span class="pass">2 / 3 (67%)</span></td></tr>
         </tbody>
       </table>
     </div>
-    <p>The shaped rewards diagnose the failure modes. On the unseen package (shaped 0.06) the policy cannot even execute its procedure. On the trained package with an unseen fault (shaped 0.75) the procedure executes flawlessly, but the fault survives the rebuild and the policy never checks its own repair. This recipe produced a <strong>reliable executor of demonstrated repair procedures, not a debugger</strong>. Closing that gap is the open training question the generator's cheap package scaling exists to serve.</p>
-    <p><strong>The direct test is built.</strong> To ask whether a <em>diverse</em> curriculum, many mechanisms across many packages including the evidence-lies tranche, pushes the policy from procedure-replay toward diagnosis, the environment now defines a held-out matrix over unseen fault type, unseen package, and unseen composite, addressed by name so a held-out seed cannot leak a trained task. The plumbing is validated end-to-end and the controls are in hand, an oracle ceiling of 39/39 and a base-model floor of 0/13 bracketing every cell. The training run itself is the open next step.</p>
+    <p><strong>Generalization is measured, not assumed, and stays hard.</strong> Evaluated across a held-out matrix (unseen fault type on a trained package, unseen package, unseen composite), the trained policy transfers at 1 / 26, essentially the in-distribution ceiling cell alone. The environment brackets this cleanly, an oracle ceiling of 39 / 39 (every cell is solvable) and a base-model floor of 0 / 13. The trained 3B is becoming a <strong>reliable executor that has learned a first diagnostic step, not yet a general debugger</strong> — exactly the memorization-versus-diagnosis gap the environment exists to measure. An earlier, larger run (13 fault types, ~111 warm-start trajectories, on a since-rebuilt environment) reached 90% in-distribution; scaling the warm-start, the curriculum, and the round count is the path to stronger numbers and any movement on transfer.</p>
   </section>
 
   <section>
