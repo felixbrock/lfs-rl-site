@@ -3,7 +3,8 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
-<title>lfs-rl — long-horizon debugging tasks built from real frontier-model failures</title>
+<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16'><text y='13' font-size='13'>%F0%9F%94%A7</text></svg>">
+<title>lfs-rl, long-horizon debugging tasks built from Claude Fable 5 failures</title>
 <style>
   :root{
     --paper:#fcfcfb; --ink:#1b1d21; --ink-soft:#474b54; --ink-faint:#868b95;
@@ -24,6 +25,9 @@
   h1{font-size:1.7rem;line-height:1.3;margin:0 0 1.4rem;letter-spacing:-.01em}
   p{margin:0 0 1.15rem}
   strong{font-weight:600}
+  /* h1 is already bold, so a nested <strong> would render LIGHTER than its
+     surroundings. Keep the weight and mark the name with colour instead. */
+  h1 strong{font-weight:inherit;color:var(--accent)}
   a{color:var(--accent);text-decoration:none;
     border-bottom:1px solid color-mix(in srgb,var(--accent) 35%,transparent)}
   .ask{border:1px solid var(--rule);background:var(--accent-soft);
@@ -40,13 +44,13 @@
 
   <div class="eyebrow">lfs-rl · seeking compute sponsorship</div>
 
-  <h1>Debugging tasks where the damage is done early and the symptom appears much later, built from mistakes a frontier model actually made.</h1>
+  <h1>Debugging tasks where the damage is done early and the symptom appears much later, built from mistakes <strong>Claude Fable 5</strong> actually made.</h1>
 
-  <p>We ran a frontier model as the operator of a real Linux system for months and recorded where it went wrong. It rarely failed at fixing a problem it had been handed. It failed at <strong>noticing something was wrong at all</strong>, hours after the actual mistake, with the evidence pointing somewhere else.</p>
+  <p>We ran Fable 5 as the operator of a real Linux system for months and recorded where it went wrong. It rarely failed at fixing a problem it had been handed. It failed at <strong>noticing something was wrong at all</strong>, hours after the actual mistake, with the evidence pointing somewhere else. Those recorded mistakes are what the tasks are made of.</p>
 
-  <p>Those recorded failures are now tasks. A fault is planted in one software package, the build continues normally, and the breakage surfaces up to fourteen packages later. The agent is told nothing about where to look. Grading is not a judgement call: a program is compiled and run inside the repaired system, and it either produces the right output or it does not.</p>
+  <p>A fault is planted in one software package, the build continues normally, and the breakage surfaces up to fourteen packages later. The agent is told nothing about where to look. Grading is not a judgement call, because a program is compiled and run inside the repaired system, and it either produces the right output or it does not.</p>
 
-  <p><strong>Nobody knows how models perform on these.</strong> That is the point. The tasks are built and proven solvable, but they have never been run at scale against a model, and the one frontier attempt we could afford needed genuine detective work rather than a known fix. Long-horizon debugging is a known weak spot, and this measures it directly.</p>
+  <p><strong>Nobody knows how models perform on these.</strong> That is the point. The tasks are built and proven solvable, but they have never been run at scale. On the one instance we could afford to test, the <em>easiest</em> one, Fable 5 did solve it, and it took 24 of its 40 allowed commands and real detective work rather than a known fix. Long-horizon debugging is a known weak spot, and this measures it directly.</p>
 
   <div class="ask">
     <h2>The ask</h2>
