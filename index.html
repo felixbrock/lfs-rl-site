@@ -3,174 +3,88 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
-<title>lfs-rl, a verifiable RL environment for systems-debugging agents</title>
-<meta name="description" content="An agent diagnoses and repairs a fault injected into a fully-built Linux system. The reward is a functional check run inside the repaired system, not a string match.">
+<title>lfs-rl — a training environment for AI agents that debug real systems</title>
 <style>
   :root{
-    --paper:#fcfcfb; --panel:#ffffff; --ink:#1b1d21; --ink-soft:#474b54; --ink-faint:#868b95;
-    --accent:#39598a; --accent-soft:#eaf0f7; --pass:#2f7d4f; --rule:#e5e5e1; --code-bg:#f4f4f1;
+    --paper:#fcfcfb; --ink:#1b1d21; --ink-soft:#474b54; --ink-faint:#868b95;
+    --accent:#39598a; --accent-soft:#eaf0f7; --rule:#e5e5e1; --pass:#2f7d4f;
     --serif:Georgia,"Iowan Old Style","Palatino Linotype","Times New Roman",serif;
     --sans:system-ui,-apple-system,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;
-    --mono:ui-monospace,"SF Mono",Menlo,Consolas,monospace;
   }
   @media (prefers-color-scheme:dark){:root{
-    --paper:#15171b; --panel:#1c1f25; --ink:#e4e6ea; --ink-soft:#a6abb4; --ink-faint:#6d727b;
-    --accent:#88a8d2; --accent-soft:#1e2733; --pass:#57b87e; --rule:#2a2e35; --code-bg:#1f2329;}}
+    --paper:#15171b; --ink:#e4e6ea; --ink-soft:#a6abb4; --ink-faint:#6d727b;
+    --accent:#88a8d2; --accent-soft:#1e2733; --rule:#2a2e35; --pass:#57b87e;}}
   *{box-sizing:border-box}
   body{margin:0;background:var(--paper);color:var(--ink);font-family:var(--serif);
-    font-size:17.5px;line-height:1.72;-webkit-font-smoothing:antialiased}
-  .wrap{max-width:716px;margin:0 auto;padding:0 26px}
-  h1,h2,h3,.label,.meta,.eyebrow,th,.fig-label,.tag,code,.mono,.num,.badge{font-family:var(--sans)}
-  a{color:var(--accent);text-decoration:none;border-bottom:1px solid color-mix(in srgb,var(--accent) 35%,transparent)}
-  a:hover{border-bottom-color:var(--accent)}
-  code{font-family:var(--mono);font-size:.86em;background:var(--code-bg);padding:1px 5px;border-radius:4px}
-
-  header{padding:66px 0 0}
-  .eyebrow{font-size:12px;letter-spacing:.14em;text-transform:uppercase;color:var(--accent);font-weight:600;margin-bottom:20px}
-  h1{font-family:var(--serif);font-weight:600;font-size:clamp(27px,4vw,34px);line-height:1.25;margin:0 0 14px;letter-spacing:-.01em;text-wrap:balance}
-  .sub{font-size:18px;color:var(--ink-soft);margin:0 0 20px;line-height:1.5}
-  .meta{font-size:12.5px;color:var(--ink-faint);letter-spacing:.02em;padding-bottom:26px;border-bottom:1px solid var(--rule)}
-  .meta span{white-space:nowrap}
-  .meta i{font-style:normal;color:var(--rule);margin:0 8px}
-
-  .abstract{margin:30px 0 6px;padding:22px 24px;background:var(--panel);border:1px solid var(--rule);border-radius:6px}
-  .abstract .label{font-size:11.5px;letter-spacing:.12em;text-transform:uppercase;color:var(--ink-faint);font-weight:600;margin-bottom:8px}
-  .abstract p{margin:0;font-size:16.5px;line-height:1.66}
-
-  section{padding:34px 0 4px}
-  h2{font-family:var(--sans);font-size:20px;font-weight:650;margin:0 0 14px;letter-spacing:-.005em;
-    padding-bottom:9px;border-bottom:1px solid var(--rule)}
-  h2 .n{color:var(--accent);font-variant-numeric:tabular-nums;margin-right:12px;font-weight:600}
-  p{margin:0 0 15px}
+    font-size:18px;line-height:1.65;-webkit-font-smoothing:antialiased}
+  .wrap{max-width:37rem;margin:0 auto;padding:4rem 1.5rem 5rem}
+  h1,h2,.eyebrow,.num,.ask h3,nav,.foot{font-family:var(--sans)}
+  .eyebrow{font-size:.75rem;letter-spacing:.12em;text-transform:uppercase;
+    color:var(--ink-faint);margin-bottom:.75rem}
+  h1{font-size:1.85rem;line-height:1.25;margin:0 0 1.25rem;letter-spacing:-.01em}
+  h2{font-size:1rem;letter-spacing:.02em;margin:2.75rem 0 .6rem;color:var(--ink-soft)}
+  p{margin:0 0 1rem}
+  .lede{font-size:1.15rem;line-height:1.6}
   strong{font-weight:600}
-  ul{margin:0 0 15px;padding-left:20px} li{margin:0 0 7px}
-
-  /* figures / tables */
-  figure{margin:22px 0;background:var(--panel);border:1px solid var(--rule);border-radius:6px;overflow:hidden}
-  .figbody{padding:20px 22px 6px}
-  figure svg{width:100%;height:auto;display:block}
-  figcaption,.tabcap{font-family:var(--sans);font-size:13px;color:var(--ink-soft);line-height:1.55;
-    padding:12px 22px;border-top:1px solid var(--rule);background:color-mix(in srgb,var(--accent-soft) 40%,transparent)}
-  .fig-label,.tab-label{font-weight:650;color:var(--ink)}
-  .tabwrap{overflow-x:auto}
-  table{border-collapse:collapse;width:100%;font-family:var(--sans);font-size:14.5px}
-  caption{caption-side:top;text-align:left;font-family:var(--sans);font-size:13px;color:var(--ink-soft);padding:0 0 10px}
-  caption b{color:var(--ink)}
-  th,td{text-align:left;padding:10px 14px;border-bottom:1px solid var(--rule)}
-  thead th{font-size:11.5px;letter-spacing:.06em;text-transform:uppercase;color:var(--ink-faint);font-weight:600}
-  .num{font-variant-numeric:tabular-nums;text-align:right}
-  tr.emph td{background:var(--accent-soft);font-weight:600}
-  .pass{color:var(--pass)}
-
-  .term{margin:20px 0;background:var(--panel);border:1px solid var(--rule);border-radius:6px;overflow:hidden}
-  .term-h{font-family:var(--sans);font-size:11.5px;color:var(--ink-faint);padding:8px 16px;border-bottom:1px solid var(--rule);letter-spacing:.03em}
-  .term-b{font-family:var(--mono);font-size:12.5px;line-height:1.9;padding:13px 16px;overflow-x:auto;color:var(--ink-soft)}
-  .term-b .l{white-space:pre}
-  .term-b .p{color:var(--accent)} .term-b .e{color:#b5482f} .term-b .g{color:var(--pass)} .term-b .c{color:var(--ink-faint)}
-  @media(prefers-color-scheme:dark){.term-b .e{color:#e07a5f}}
-
-  .avail{list-style:none;padding:0;margin:0}
-  .avail li{padding:9px 0;border-bottom:1px solid var(--rule);font-size:16px;display:flex;gap:14px}
-  .avail li:last-child{border-bottom:none}
-  .avail .k{font-family:var(--sans);font-size:12.5px;font-weight:600;color:var(--ink-faint);text-transform:uppercase;letter-spacing:.05em;flex:0 0 116px;padding-top:3px}
-
-  .close{margin:30px 0 4px;padding:22px 24px;background:var(--accent-soft);border:1px solid var(--rule);border-radius:6px}
-  .close p{margin:0}
-  footer{margin-top:40px;padding:22px 0 64px;border-top:1px solid var(--rule);font-family:var(--sans);font-size:12.5px;color:var(--ink-faint)}
-  @media(max-width:520px){.avail li{flex-direction:column;gap:2px}.avail .k{flex-basis:auto}}
+  a{color:var(--accent);text-decoration:none;
+    border-bottom:1px solid color-mix(in srgb,var(--accent) 35%,transparent)}
+  .result{border-left:3px solid var(--accent);background:var(--accent-soft);
+    padding:1.1rem 1.25rem;margin:1.5rem 0;border-radius:0 4px 4px 0}
+  .result p{margin:0}
+  .result p + p{margin-top:.6rem}
+  .num{font-weight:600;color:var(--pass)}
+  ul{margin:0 0 1rem;padding-left:1.1rem}
+  li{margin-bottom:.45rem}
+  .ask{border:1px solid var(--rule);border-radius:6px;padding:1.25rem 1.4rem;margin:1.5rem 0}
+  .ask h3{margin:0 0 .6rem;font-size:.95rem}
+  .ask p:last-child{margin-bottom:0}
+  .foot{margin-top:3.5rem;padding-top:1.25rem;border-top:1px solid var(--rule);
+    font-size:.85rem;color:var(--ink-faint)}
+  .foot a{margin-right:1.25rem}
 </style>
 </head>
 <body>
-
 <div class="wrap">
-  <header>
-    <div class="eyebrow">Technical summary</div>
-    <h1>lfs-rl, a verifiable RL environment for systems-debugging agents</h1>
-    <p class="sub">An agent diagnoses and repairs a fault injected into a fully-built Linux system. The reward is a functional check run inside the repaired system, not a string match.</p>
-    <div class="meta"><span>RLVR</span><i>·</i><span>reward-hack-resistant</span><i>·</i><span><code>verifiers</code>-compatible</span><i>·</i><span>74 fault instances</span><i>·</i><span>deterministic</span></div>
-  </header>
 
-  <div class="abstract">
-    <div class="label">Abstract</div>
-    <p>lfs-rl is a reinforcement-learning environment in which an agent diagnoses and repairs a fault injected into a fully-built Linux From Scratch system, using a shell and no hints. An out-of-band verifier runs a program inside the repaired system, so the reward resists gaming. With the included pipeline (supervised warm-start, then GRPO) a Qwen2.5-3B trains end-to-end on an 18-fault curriculum, reaching <strong>50% binary full-solve</strong> on trained faults from a 0% base rate. On faults that require a repair step before the rebuild — removing a sabotaged compiler configuration — the base model scores 0% and the supervised warm-start reaches it only intermittently (33%), while GRPO <strong>converges on it reliably, reaching 100%</strong> across every package that has it; that particular repair happens to be phrased identically regardless of package, which is a large part of why it generalizes — a caveat this project takes seriously enough that it is now redesigning the training data to demonstrate genuine diagnosis (see below) rather than assume exploration alone accounts for it. Generalization to held-out fault types and packages stays flat at 8% regardless of curriculum size, cleanly separating procedural mastery from genuine diagnosis. On a representative subset, a frontier model solves the scoped tasks zero-shot — notably, several fault mechanisms are distilled from failures that fooled frontier models in real operation, so the benchmark is the clean, verifiable version of problems that are hard in the wild.</p>
+  <div class="eyebrow">lfs-rl · seeking compute sponsorship</div>
+  <h1>A training environment where AI agents fix real broken Linux systems, and the reward is whether the system actually works.</h1>
+
+  <p class="lede">Most benchmarks check whether an answer <em>looks</em> right. Here, a program is compiled and run inside the repaired system. If it produces the wrong output, the agent fails. There is nothing to fake.</p>
+
+  <h2>What it already proved</h2>
+
+  <div class="result">
+    <p>A small open model (3 billion parameters) went from <span class="num">0%</span> to <span class="num">58%</span> on broken systems it had never seen before.</p>
+    <p>Crucially, we can prove it reasoned rather than memorised: each repair was hidden behind a detail that exists only inside that specific machine, and we checked every successful run to confirm the model looked it up before acting.</p>
   </div>
 
-  <section>
-    <h2><span class="n">1</span>Environment</h2>
-    <p>Each episode begins from a working Linux From Scratch (LFS) chroot with a single injected fault. The set contains <strong>74 deterministic instances</strong> across five library packages and a broad fault taxonomy, from toolchain sabotage and cross-package breaks to runtime-correctness faults where the library builds but returns wrong data. A distinct tranche models <strong>realistic operational failure modes in which the evidence lies</strong>, a header quietly shadowed by a stale one, a <code>make</code> that is secretly a dry run and writes nothing while exiting 0, a downloaded tarball that is really a saved error page, a library that keeps winning at load time after a clean rebuild. In these the error blames the wrong thing, so the agent must genuinely diagnose rather than pattern-match a known repair. The agent gets a shell with sudo and no network, one command per turn. Episodes run in a rootless sandbox at about <strong>1.6 seconds each</strong>, which makes on-policy RL over real package builds practical.</p>
-    <div class="term">
-      <div class="term-h">Example episode. A cross-package fault (symptom in one package, cause in another)</div>
-      <div class="term-b">
-<div class="l"><span class="p">$</span> chroot /mnt/lfs make -C /sources/kmod-34.2</div>
-<div class="l"><span class="e">/usr/bin/ld: undefined reference to `gzread'</span>  <span class="c"># symptom: kmod won't link</span></div>
-<div class="l"><span class="p">$</span> ls -l /usr/lib/libz.so</div>
-<div class="l">libz.so -&gt; <span class="e">libbz2.so.1.0</span>  <span class="c"># cause: zlib's dev symlink is mispointed</span></div>
-<div class="l"><span class="p">$</span> ln -sf libz.so.1.3.1 /usr/lib/libz.so &amp;&amp; make &amp;&amp; make install</div>
-<div class="l"><span class="g">verifier: libkmod compiles, links, and runs (reward 1.0)</span></div>
-      </div>
-    </div>
-  </section>
+  <p>Getting there also produced a reusable finding: <strong>what training examples must contain for an agent to learn diagnosis instead of recall.</strong> Three designs failed first, each for a reason we could read in the transcripts.</p>
 
-  <section>
-    <h2><span class="n">2</span>Verifiable reward</h2>
-    <p>A functional verifier scores each episode out-of-band. It compiles a small canary program inside the repaired system, runs it, and compares the output against ground truth, for example a compress/decompress round-trip. The reward reflects whether the repair actually works, not whether the expected files are present. A stub library that only fakes the version string does not pass. We implemented that attack ourselves and every verifier rejects it. A dense shaped reward over milestones gives a weak base policy gradient, and a binary reward is used for evaluation. Adding a package needs only a new canary, and an automated check proves each new fault both <strong>solvable</strong> (the reference fix passes) and <strong>biting</strong> (a naive rebuild does not) before it enters the set.</p>
-  </section>
+  <h2>The harder tier, and why it matters</h2>
 
-  <section>
-    <h2><span class="n">3</span>Training result</h2>
-    <p>We regenerate a supervised warm-start (90 oracle reference-fix trajectories spanning all 18 training faults), then run GRPO with a shaped reward on a single GPU, serving generation through vLLM with the adapter hot-loaded each round. Training converged after six gradient updates: mean shaped reward climbed from 0.21 to 0.60, and the seventh round hit zero within-group variance, every fault had settled into a uniform pass or uniform fail across its group, leaving nothing left for GRPO to learn from. Table 1 reports binary full-solve on the trained faults.</p>
-    <div class="tabwrap">
-      <table>
-        <caption><b>Table 1.</b> Binary full-solve rate on the trained faults (the repaired system must run correctly, not merely build), Qwen2.5-3B, 18-fault curriculum. One rollout per fault: the base&rarr;GRPO gain is significant (paired p&nbsp;=&nbsp;0.004) and corroborated by training-time pass rates; the SFT&rarr;GRPO delta alone is directional, not precise.</caption>
-        <thead><tr><th>Policy</th><th class="num">Full-solve, trained faults</th></tr></thead>
-        <tbody>
-          <tr><td>Base model</td><td class="num">0 / 18 (0%)</td></tr>
-          <tr><td>+ supervised warm-start</td><td class="num">5 / 18 (28%)</td></tr>
-          <tr class="emph"><td>+ GRPO (final)</td><td class="num"><span class="pass">9 / 18 (50%)</span></td></tr>
-        </tbody>
-      </table>
-    </div>
-    <p><strong>RL learns a repair supervision could not fully teach — but only within one fault category, and we traced why.</strong> The warm-start reliably reproduces a package <em>rebuild</em> (3 / 4 clean-rebuild instances, matched by GRPO) and picks up the compiler-spec repair on one of three packages, but the GRPO gain concentrates entirely in toolchain-type faults (6 / 9, 67%) versus zero on the faults modeling realistic operational failure, where the evidence itself misleads (0 / 3). Auditing the warm-start data explains the split: it is generated by replaying each fault's reference fix directly, with no diagnostic step shown, ever. For the toolchain faults that fix happens to be one command that is identical across every package (a coincidence of how gcc's own tooling reports the path); the model only has to reproduce one memorized string, and that trivially looks like it transfers. For the faults that require locating something package-specific — a stray header, a swapped-out build tool — there is no shared string to fall back on, and the data never demonstrated how to find one either. We then rewrote the warm-start generator for these faults to include the investigative command (list the suspect directory, run <code>file</code> on the suspect artifact) ahead of the fix, retrained, and saw no movement (held-out 0 / 13, targeted faults still 0 in-distribution) — and a subsequent setup audit showed why that run cannot settle the question: the demonstrated diagnostic step was <em>constant</em> per fault family, with a fix that never depended on what the evidence revealed, so the data could not teach observation-conditioned diagnosis even in principle, and its single-sample eval deltas carry no statistical weight. The audit also surfaced sampler and regularization flaws (now fixed) affecting all runs equally. What stands across four mutually consistent runs is the environment's core claim: it cleanly and reproducibly <em>measures</em> the memorization-versus-diagnosis gap in small open models — GRPO beats the base model in-distribution decisively (paired p = 0.004) while transfer to genuinely unseen faults stays at zero under ritual-style training data. The properly designed experiment was then run: a new fault family hides the repair target at an instance-specific path named only inside a script the agent must read, demonstrations show the discriminating check in <em>every</em> trajectory with the continuation branching on its visible outcome, and evals keep full transcripts at four samples per instance. Iterating that design three times (each failure diagnosed from retained transcripts: constant fixes teach strings; optional checks collapse into ritual mixtures; with several fault families, even <em>choosing</em> the opening check is oracle-knowledge unless every trajectory opens with one universal read-only triage and branches on the observed anomaly) produced the project's headline result. Across three mechanically different evidence families, on held-out instances whose repair target appears in zero training trajectories, the trained 3B runs the triage, reads what it finds, and repairs exactly what it observed — full-solve on the transfer cell <strong>0% base &rarr; 33% supervised &rarr; 58% after a five-round GRPO probe</strong> (one family at 8/8), with every single pass mechanically verified against its own episode's evidence and the transfer cell matching or beating in-distribution at every stage. Transfer to an entirely unseen <em>package</em> remains 0%, traced to a build recipe never demonstrated rather than failed diagnosis — the next measured cell.</p>
-    <div class="tabwrap">
-      <table>
-        <caption><b>Table 2.</b> Per-fault-family full-solve, base &rarr; warm-start &rarr; GRPO. The second row is the point of the RL stage.</caption>
-        <thead><tr><th>Fault</th><th class="num">Base</th><th class="num">Warm-start</th><th class="num">GRPO</th></tr></thead>
-        <tbody>
-          <tr><td>clean rebuild, 4 packages (rebuild is the fix)</td><td class="num">0 / 4</td><td class="num">3 / 4</td><td class="num"><span class="pass">3 / 4</span></td></tr>
-          <tr class="emph"><td>sabotaged compiler spec, zlib/xz/expat (repair, then rebuild)</td><td class="num">0 / 3</td><td class="num">1 / 3</td><td class="num"><span class="pass">3 / 3 (100%)</span></td></tr>
-        </tbody>
-      </table>
-    </div>
-    <p><strong>Generalization is measured, not assumed, and does not move with curriculum size.</strong> Tripling the training curriculum from 6 to 18 faults nearly doubled the final GRPO in-distribution rate versus a smaller earlier run on the same environment (28% &rarr; 50%), but held-out transfer stayed exactly flat at 1 / 13 (8%) both before and after GRPO on this run. That one pass is a trained fault resampled under the eval harness, not a genuinely unseen instance; every truly held-out cell (unseen fault type, unseen package, unseen composite, unseen combination of both) is 0% for every policy tested, including GRPO. Every fault in the environment, trained or held-out, is proven solvable by its reference fix and unsolved by a naive rebuild before it enters the set. The finding this scaling run was built to test: <strong>training-fault diversity is not the lever that closes the memorization-versus-diagnosis gap</strong> — the trained model reliably reproduces more of what it was shown, not how to diagnose something new. An earlier, larger run (13 fault types, ~111 warm-start trajectories, on a since-rebuilt environment, later found to have eval/train overlap in the warm-start data) reached 90% in-distribution; the number above is the more rigorously split, currently reproducible one.</p>
-  </section>
+  <p>Real incidents are hard because the damage is done early and the symptom appears much later, somewhere else. So we built that: a fault is planted in one software package, the build continues, and the failure surfaces up to fourteen packages later. The agent is told nothing about where to look.</p>
 
-  <section>
-    <h2><span class="n">4</span>Difficulty calibration</h2>
-    <p>We measured a frontier model on a <strong>representative subset</strong> of faults via a sub-agent harness, one attempt each, each result <strong>independently confirmed by the harness's own verifier</strong> (not the agent's self-report) before the instance was torn down. On the earlier tiers it solved them in 8 to 11 commands; the evidence-lies tranche pushes deeper — <strong>6/6 verified pass</strong>, in 7 to 18 commands, since whole families of hypotheses must be eliminated when the error blames the wrong thing (the composite fault, two independent root causes in one instance, took the most). An important nuance: several of those mechanisms are distilled from failures that actually fooled frontier models operating a real system — the benchmark <em>scopes</em> the task ("this package is broken, repair it"), which is easier than the operational original, where the model had to notice the problem itself amid misleading evidence. So the scoped tasks are within frontier reach, which makes the environment's value today its <strong>training and evaluation of open models</strong>, where it resolves the capability gradient from 0% up.</p>
-  </section>
+  <p>A frontier model solved one of these, but it took real detective work: rebuilding a library from source and comparing it byte by byte against the installed copy to find a single sabotaged function. That is the kind of task current models are still weak at, which is exactly what makes it worth training on.</p>
 
-  <section>
-    <h2><span class="n">5</span>Integration and cost</h2>
-    <ul class="avail">
-      <li><span class="k">Format</span><span>Packaged as a <code>verifiers</code> environment and validated end-to-end against a live model endpoint.</span></li>
-      <li><span class="k">Determinism</span><span>The same seed reproduces the same fault and verifier.</span></li>
-      <li><span class="k">Footprint</span><span>Rootless sandbox, ~1.6 s/episode, ~200 MB per instance. A full training run cost about $0.50 of GPU.</span></li>
-      <li><span class="k">Isolation</span><span>The sandbox runs untrusted, agent-generated shell. Its filesystem view is allow-list, only the directories a build needs are kept and everything else on the host is shadowed, with a private loopback-only network. Verified by writing a marker into every host path from inside and confirming none reached the host.</span></li>
-      <li><span class="k">Included</span><span>The environment, fault generator, end-to-end training pipeline and recipe (which reproduces the results above), and the calibration harness.</span></li>
-      <li><span class="k">Scaling</span><span>Faults are parameterised over the package, so each new library reuses the whole taxonomy for a small verifier and one entry; the set has grown to <strong>74 faults, each proven solvable and biting</strong> by CI. Further packages are staged.</span></li>
-    </ul>
-  </section>
+  <h2>Why this is unusual</h2>
+  <ul>
+    <li><strong>Cheap to run.</strong> About 1.6 seconds per attempt, so training can sample thousands of them. Comparable environments need minutes and a Kubernetes cluster.</li>
+    <li><strong>Cannot be gamed.</strong> The grading runs outside the agent's reach and we have attacked it ourselves.</li>
+    <li><strong>It measures honestly.</strong> It has produced published negative results, including two of our own hypotheses that turned out to be wrong.</li>
+    <li><strong>Nobody else is here.</strong> Every comparable project is an evaluation benchmark. None is built for training.</li>
+  </ul>
 
-  <section>
-    <h2><span class="n">6</span>Fit and availability</h2>
-    <p>lfs-rl is intended for teams and platforms that train or evaluate open models on agentic, coding, or operations tasks, and for RL-environment marketplaces that require verifiable, hard-to-game rewards.</p>
-    <div class="close">
-      <p>The full environment, training pipeline, and calibration data are available for evaluation. We welcome a technical review.</p>
-    </div>
-  </section>
+  <div class="ask">
+    <h3>What we are asking for</h3>
+    <p>GPU compute to run the training programme on the hard tier. A first meaningful run is roughly <strong>$300</strong>; a thorough programme, a few thousand.</p>
+    <p>Everything above was built for under $20 of GPU time, on one laptop. The environment, the fault generator, the training pipeline and every result are already working and public.</p>
+  </div>
 
-  <footer>lfs-rl, an RLVR environment for systems-debugging agents. Results, per-class tables, and the calibration harness are included in the repository.</footer>
+  <div class="foot">
+    <a href="https://github.com/felixbrock/lfs-rl">Code and full results</a>
+    <a href="technical.html">Technical detail</a>
+  </div>
+
 </div>
-
 </body>
 </html>
