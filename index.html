@@ -3,42 +3,34 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
-<title>lfs-rl — a training environment for AI agents that debug real systems</title>
+<title>lfs-rl — long-horizon debugging tasks built from real frontier-model failures</title>
 <style>
   :root{
     --paper:#fcfcfb; --ink:#1b1d21; --ink-soft:#474b54; --ink-faint:#868b95;
-    --accent:#39598a; --accent-soft:#eaf0f7; --rule:#e5e5e1; --pass:#2f7d4f;
+    --accent:#39598a; --accent-soft:#eaf0f7; --rule:#e5e5e1;
     --serif:Georgia,"Iowan Old Style","Palatino Linotype","Times New Roman",serif;
     --sans:system-ui,-apple-system,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;
   }
   @media (prefers-color-scheme:dark){:root{
     --paper:#15171b; --ink:#e4e6ea; --ink-soft:#a6abb4; --ink-faint:#6d727b;
-    --accent:#88a8d2; --accent-soft:#1e2733; --rule:#2a2e35; --pass:#57b87e;}}
+    --accent:#88a8d2; --accent-soft:#1e2733; --rule:#2a2e35;}}
   *{box-sizing:border-box}
   body{margin:0;background:var(--paper);color:var(--ink);font-family:var(--serif);
     font-size:18px;line-height:1.65;-webkit-font-smoothing:antialiased}
-  .wrap{max-width:37rem;margin:0 auto;padding:4rem 1.5rem 5rem}
-  h1,h2,.eyebrow,.num,.ask h3,nav,.foot{font-family:var(--sans)}
+  .wrap{max-width:34rem;margin:0 auto;padding:4.5rem 1.5rem 5rem}
+  h1,.eyebrow,.ask h2,.foot{font-family:var(--sans)}
   .eyebrow{font-size:.75rem;letter-spacing:.12em;text-transform:uppercase;
-    color:var(--ink-faint);margin-bottom:.75rem}
-  h1{font-size:1.85rem;line-height:1.25;margin:0 0 1.25rem;letter-spacing:-.01em}
-  h2{font-size:1rem;letter-spacing:.02em;margin:2.75rem 0 .6rem;color:var(--ink-soft)}
-  p{margin:0 0 1rem}
-  .lede{font-size:1.15rem;line-height:1.6}
+    color:var(--ink-faint);margin-bottom:.9rem}
+  h1{font-size:1.7rem;line-height:1.3;margin:0 0 1.4rem;letter-spacing:-.01em}
+  p{margin:0 0 1.15rem}
   strong{font-weight:600}
   a{color:var(--accent);text-decoration:none;
     border-bottom:1px solid color-mix(in srgb,var(--accent) 35%,transparent)}
-  .result{border-left:3px solid var(--accent);background:var(--accent-soft);
-    padding:1.1rem 1.25rem;margin:1.5rem 0;border-radius:0 4px 4px 0}
-  .result p{margin:0}
-  .result p + p{margin-top:.6rem}
-  .num{font-weight:600;color:var(--pass)}
-  ul{margin:0 0 1rem;padding-left:1.1rem}
-  li{margin-bottom:.45rem}
-  .ask{border:1px solid var(--rule);border-radius:6px;padding:1.25rem 1.4rem;margin:1.5rem 0}
-  .ask h3{margin:0 0 .6rem;font-size:.95rem}
+  .ask{border:1px solid var(--rule);background:var(--accent-soft);
+    border-radius:6px;padding:1.3rem 1.4rem;margin:2rem 0 0}
+  .ask h2{margin:0 0 .6rem;font-size:.95rem;letter-spacing:.02em}
   .ask p:last-child{margin-bottom:0}
-  .foot{margin-top:3.5rem;padding-top:1.25rem;border-top:1px solid var(--rule);
+  .foot{margin-top:3rem;padding-top:1.2rem;border-top:1px solid var(--rule);
     font-size:.85rem;color:var(--ink-faint)}
   .foot a{margin-right:1.25rem}
 </style>
@@ -47,41 +39,23 @@
 <div class="wrap">
 
   <div class="eyebrow">lfs-rl · seeking compute sponsorship</div>
-  <h1>A training environment where AI agents fix real broken Linux systems, and the reward is whether the system actually works.</h1>
 
-  <p class="lede">Most benchmarks check whether an answer <em>looks</em> right. Here, a program is compiled and run inside the repaired system. If it produces the wrong output, the agent fails. There is nothing to fake.</p>
+  <h1>Debugging tasks where the damage is done early and the symptom appears much later, built from mistakes a frontier model actually made.</h1>
 
-  <h2>What it already proved</h2>
+  <p>We ran a frontier model as the operator of a real Linux system for months and recorded where it went wrong. It rarely failed at fixing a problem it had been handed. It failed at <strong>noticing something was wrong at all</strong>, hours after the actual mistake, with the evidence pointing somewhere else.</p>
 
-  <div class="result">
-    <p>A small open model (3 billion parameters) went from <span class="num">0%</span> to <span class="num">58%</span> on broken systems it had never seen before.</p>
-    <p>Crucially, we can prove it reasoned rather than memorised: each repair was hidden behind a detail that exists only inside that specific machine, and we checked every successful run to confirm the model looked it up before acting.</p>
-  </div>
+  <p>Those recorded failures are now tasks. A fault is planted in one software package, the build continues normally, and the breakage surfaces up to fourteen packages later. The agent is told nothing about where to look. Grading is not a judgement call: a program is compiled and run inside the repaired system, and it either produces the right output or it does not.</p>
 
-  <p>Getting there also produced a reusable finding: <strong>what training examples must contain for an agent to learn diagnosis instead of recall.</strong> Three designs failed first, each for a reason we could read in the transcripts.</p>
-
-  <h2>The harder tier, and why it matters</h2>
-
-  <p>Real incidents are hard because the damage is done early and the symptom appears much later, somewhere else. So we built that: a fault is planted in one software package, the build continues, and the failure surfaces up to fourteen packages later. The agent is told nothing about where to look.</p>
-
-  <p>A frontier model solved one of these, but it took real detective work: rebuilding a library from source and comparing it byte by byte against the installed copy to find a single sabotaged function. That is the kind of task current models are still weak at, which is exactly what makes it worth training on.</p>
-
-  <h2>Why this is unusual</h2>
-  <ul>
-    <li><strong>Cheap to run.</strong> About 1.6 seconds per attempt, so training can sample thousands of them. Comparable environments need minutes and a Kubernetes cluster.</li>
-    <li><strong>Cannot be gamed.</strong> The grading runs outside the agent's reach and we have attacked it ourselves.</li>
-    <li><strong>It measures honestly.</strong> It has produced published negative results, including two of our own hypotheses that turned out to be wrong.</li>
-    <li><strong>Nobody else is here.</strong> Every comparable project is an evaluation benchmark. None is built for training.</li>
-  </ul>
+  <p><strong>Nobody knows how models perform on these.</strong> That is the point. The tasks are built and proven solvable, but they have never been run at scale against a model, and the one frontier attempt we could afford needed genuine detective work rather than a known fix. Long-horizon debugging is a known weak spot, and this measures it directly.</p>
 
   <div class="ask">
-    <h3>What we are asking for</h3>
-    <p>GPU compute to run the training programme on the hard tier. A first meaningful run is roughly <strong>$300</strong>; a thorough programme, a few thousand.</p>
-    <p>Everything above was built for under $20 of GPU time, on one laptop. The environment, the fault generator, the training pipeline and every result are already working and public.</p>
+    <h2>The ask</h2>
+    <p>GPU compute to find out. A first meaningful run is about <strong>$300</strong>, a full programme a few thousand.</p>
+    <p>The environment, the fault generator and the grading are already built and working, on one laptop, for under $20 of GPU time.</p>
   </div>
 
   <div class="foot">
-    <a href="https://github.com/felixbrock/lfs-rl">Code and full results</a>
+    <a href="https://github.com/felixbrock/lfs-rl">Code and results</a>
     <a href="technical.html">Technical detail</a>
   </div>
 
