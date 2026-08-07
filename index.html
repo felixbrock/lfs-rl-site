@@ -30,6 +30,21 @@
   h1 strong{font-weight:inherit;color:var(--accent)}
   a{color:var(--accent);text-decoration:none;
     border-bottom:1px solid color-mix(in srgb,var(--accent) 35%,transparent)}
+  h2.sec{font-family:var(--sans);font-size:.78rem;letter-spacing:.1em;
+    text-transform:uppercase;color:var(--ink-faint);font-weight:600;
+    margin:2.4rem 0 .9rem}
+  /* Two-column spec. Collapses to stacked rows on narrow screens so the
+     values never get squeezed into a two-word-per-line column. */
+  .spec{display:grid;grid-template-columns:minmax(7rem,9.5rem) 1fr;
+    gap:.6rem 1.2rem;margin:0;font-size:.94rem}
+  .spec dt{font-family:var(--sans);font-size:.82rem;color:var(--ink-faint);
+    line-height:1.5;padding-top:.12rem}
+  .spec dd{margin:0}
+  .spec b{font-weight:600}
+  @media (max-width:30rem){
+    .spec{grid-template-columns:1fr;gap:.15rem}
+    .spec dd{margin-bottom:.7rem}
+  }
   .ask{border:1px solid var(--rule);background:var(--accent-soft);
     border-radius:6px;padding:1.3rem 1.4rem;margin:2rem 0 0}
   .ask h2{margin:0 0 .6rem;font-size:.95rem;letter-spacing:.02em}
@@ -50,12 +65,43 @@
 
   <p>A fault is planted in one software package, the build continues normally, and the breakage surfaces up to fourteen packages later. The agent is told nothing about where to look. Grading is not a judgement call, because a program is compiled and run inside the repaired system, and it either produces the right output or it does not.</p>
 
-  <p><strong>Nobody knows how models perform on these.</strong> That is the point. The tasks are built and proven solvable, but they have never been run at scale. On the one instance we could afford to test, the <em>easiest</em> one, Fable 5 did solve it, and it took 24 of its 40 allowed commands and real detective work rather than a known fix. Long-horizon debugging is a known weak spot, and this measures it directly.</p>
+  <p><strong>Nobody knows how models perform on these.</strong> That is the point. The tasks are built and proven solvable, but they have never been run at scale. Long-horizon debugging is a known weak spot, and this measures it directly.</p>
+
+  <h2 class="sec">What exists today</h2>
+  <dl class="spec">
+    <dt>Tasks verified</dt>
+    <dd><b>3</b>, each passing 3 machine-checked properties (the fault bites, fixing the package where it surfaces is not enough, fixing the real cause works)</dd>
+
+    <dt>Built, then rejected</dt>
+    <dd><b>2 of 5</b>, thrown out by that same checker for failing a property</dd>
+
+    <dt>Distance, cause to symptom</dt>
+    <dd><b>5, 5 and 14</b> packages</dd>
+
+    <dt>Difficulty is a dial</dt>
+    <dd>one fault family verified at <b>both</b> distance 5 and distance 14, so the axis is turned by a parameter, not by new design work</dd>
+
+    <dt>Room to grow</dt>
+    <dd><b>82</b> packages downstream of the seed point, each a possible symptom site</dd>
+
+    <dt>Grading</dt>
+    <dd>a program is compiled and run inside the repaired system, so there is no judge model and no answer string to match</dd>
+
+    <dt>Frontier baseline</dt>
+    <dd>Fable 5 solved the <em>easiest</em> task in <b>24 of 40</b> allowed commands, and needed real detective work rather than a known fix</dd>
+
+    <dt>Spent so far</dt>
+    <dd>under <b>$20</b> of GPU time, on one laptop</dd>
+  </dl>
+
+  <h2 class="sec">How it is built</h2>
+
+  <p>The environment follows three published designs. <a href="https://arxiv.org/abs/2511.07317">RLVE</a> keeps task difficulty matched to the model being trained, which is applied now and is why distance is a parameter. <a href="https://arxiv.org/abs/2607.14171">BPO</a> forks rollouts from sandbox snapshots, which is why the substrate can fork at any package instead of rebuilding from scratch. <a href="https://arxiv.org/abs/2607.13988">TRACE</a> assigns credit to individual steps of a long task, which is designed against our state-based grading and waits on training starting.</p>
 
   <div class="ask">
     <h2>The ask</h2>
     <p>GPU compute to find out. A first meaningful run is about <strong>$300</strong>, a full programme a few thousand.</p>
-    <p>The environment, the fault generator and the grading are already built and working, on one laptop, for under $20 of GPU time.</p>
+    <p>The environment, the fault generator and the grading already work. What is missing is the compute to run models against them.</p>
   </div>
 
   <div class="foot">
