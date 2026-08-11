@@ -6,76 +6,118 @@
 <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16'><text y='13' font-size='13'>%F0%9F%94%A7</text></svg>">
 <title>lfs-rl, verifiable debugging environments derived from Claude Fable 5 failures</title>
 <meta name="description" content="An agent diagnoses and repairs a fault injected into a fully-built Linux system. The reward is a functional check run inside the repaired system, not a string match.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=STIX+Two+Text:ital,wght@0,400;0,600;0,700;1,400&family=IBM+Plex+Sans:wght@400;500;600&display=swap" rel="stylesheet">
 <style>
   :root{
-    --paper:#fcfcfb; --panel:#ffffff; --ink:#1b1d21; --ink-soft:#474b54; --ink-faint:#868b95;
-    --accent:#39598a; --accent-soft:#eaf0f7; --pass:#2f7d4f; --rule:#e5e5e1; --code-bg:#f4f4f1;
-    --serif:Georgia,"Iowan Old Style","Palatino Linotype","Times New Roman",serif;
-    --sans:system-ui,-apple-system,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;
+    --paper:#faf8f4; --panel:#fffdf9; --ink:#211f1c; --ink-soft:#54524c; --ink-faint:#8a877f;
+    --accent:#7d2f35; --rule:#e4ddd1; --rule-strong:#454239; --code-bg:#f1ece2; --pass:#2f6b45;
+    --err:#a03426;
+    --serif:"STIX Two Text","Iowan Old Style",Palatino,"Palatino Linotype",Georgia,serif;
+    --sans:"IBM Plex Sans","Segoe UI",system-ui,sans-serif;
     --mono:ui-monospace,"SF Mono",Menlo,Consolas,monospace;
   }
   @media (prefers-color-scheme:dark){:root{
-    --paper:#15171b; --panel:#1c1f25; --ink:#e4e6ea; --ink-soft:#a6abb4; --ink-faint:#6d727b;
-    --accent:#88a8d2; --accent-soft:#1e2733; --pass:#57b87e; --rule:#2a2e35; --code-bg:#1f2329;}}
+    --paper:#1a1816; --panel:#201e1b; --ink:#e9e4da; --ink-soft:#aeaaa0; --ink-faint:#767268;
+    --accent:#d4949a; --rule:#343129; --rule-strong:#bab5aa; --code-bg:#252220; --pass:#6cbd8c;
+    --err:#e08573;}}
   *{box-sizing:border-box}
   body{margin:0;background:var(--paper);color:var(--ink);font-family:var(--serif);
-    font-size:18px;line-height:1.65;-webkit-font-smoothing:antialiased}
-  .wrap{max-width:34rem;margin:0 auto;padding:4.5rem 1.5rem 5rem}
-  h1,.eyebrow,.foot{font-family:var(--sans)}
-  .eyebrow{font-size:.75rem;letter-spacing:.12em;text-transform:uppercase;
-    color:var(--ink-faint);margin-bottom:.9rem}
-  h1{font-size:1.7rem;line-height:1.3;margin:0 0 1.4rem;letter-spacing:-.01em}
-  p{margin:0 0 1.15rem}
-  strong{font-weight:600}
-  /* h1 is already bold, so a nested <strong> would render LIGHTER than its
-     surroundings. Keep the weight and mark the name with colour instead. */
-  h1 strong{font-weight:inherit;color:var(--accent)}
+    font-size:17.5px;line-height:1.68;-webkit-font-smoothing:antialiased}
+  .wrap{max-width:41rem;margin:0 auto;padding:4rem 1.4rem 5rem}
   a{color:var(--accent);text-decoration:none;
-    border-bottom:1px solid color-mix(in srgb,var(--accent) 35%,transparent)}
-  code{font-family:var(--mono);font-size:.86em;background:var(--code-bg);padding:1px 5px;border-radius:4px}
-  h2.sec{font-family:var(--sans);font-size:.78rem;letter-spacing:.1em;
+    border-bottom:1px solid color-mix(in srgb,var(--accent) 40%,transparent)}
+  a:hover{border-bottom-color:var(--accent)}
+  p{margin:0 0 1.05rem}
+  strong{font-weight:600}
+  code{font-family:var(--mono);font-size:.85em;background:var(--code-bg);padding:1px 5px;border-radius:3px}
+
+  /* -- title block, journal style ------------------------------------- */
+  header{text-align:center;margin-bottom:2.1rem}
+  .eyebrow{font-family:var(--sans);font-size:.68rem;letter-spacing:.22em;
+    text-transform:uppercase;color:var(--ink-faint);margin-bottom:1.1rem}
+  h1{font-size:clamp(1.5rem,4vw,1.95rem);line-height:1.28;font-weight:600;
+    margin:0 0 .8rem;letter-spacing:-.008em}
+  h1 strong{font-weight:inherit;color:var(--accent)}
+  .meta{font-style:italic;font-size:.92rem;color:var(--ink-soft);margin:0}
+  /* classic double rule under the title block */
+  .rule2{margin-top:1.6rem;height:5px;
+    border-top:2px solid var(--rule-strong);border-bottom:1px solid var(--rule-strong)}
+
+  /* -- sections -------------------------------------------------------- */
+  .kick{font-family:var(--sans);font-size:.66rem;letter-spacing:.16em;
+    text-transform:uppercase;color:var(--accent);font-weight:600;margin:2.7rem 0 .15rem}
+  .kick + h2{margin-top:.1rem}
+  h2{position:relative;font-size:1.16rem;font-weight:700;margin:2.7rem 0 .7rem;
+    letter-spacing:-.005em}
+  h2 .n{color:var(--accent);font-variant-numeric:tabular-nums;font-weight:600}
+  @media (min-width:56rem){
+    h2 .n{position:absolute;right:100%;margin-right:1.15rem}
+  }
+  @media (max-width:55.99rem){ h2 .n{margin-right:.55rem} }
+  .status{font-family:var(--sans);font-size:.8rem;color:var(--ink-soft);
+    margin:0 0 .85rem}
+  .status b{font-weight:600;letter-spacing:.05em;text-transform:uppercase;
+    font-size:.72rem;color:var(--ink-faint)}
+
+  /* -- captions (tables, listing) -------------------------------------- */
+  .cap{font-family:var(--sans);font-size:.76rem;line-height:1.55;color:var(--ink-soft);
+    margin:1.5rem 0 .5rem;text-align:left}
+  .cap b{color:var(--ink);font-weight:600}
+
+  /* -- booktabs tables -------------------------------------------------- */
+  .tabwrap{overflow-x:auto;margin:0 0 1.4rem}
+  table{border-collapse:collapse;width:100%;font-size:.92rem}
+  thead th{font-family:var(--sans);font-size:.66rem;letter-spacing:.09em;
     text-transform:uppercase;color:var(--ink-faint);font-weight:600;
-    margin:2.4rem 0 .9rem}
-  /* Two-column spec. Collapses to stacked rows on narrow screens so the
-     values never get squeezed into a two-word-per-line column. */
-  .spec{display:grid;grid-template-columns:minmax(7rem,9.5rem) 1fr;
-    gap:.6rem 1.2rem;margin:0;font-size:.94rem}
-  .spec dt{font-family:var(--sans);font-size:.82rem;color:var(--ink-faint);
-    line-height:1.5;padding-top:.12rem}
-  .spec dd{margin:0}
+    border-top:2px solid var(--rule-strong);border-bottom:1px solid var(--rule-strong);
+    padding:.5rem .7rem;text-align:left}
+  td{padding:.5rem .7rem;border-bottom:1px solid var(--rule)}
+  tbody tr:last-child td{border-bottom:2px solid var(--rule-strong)}
+  .num{font-variant-numeric:tabular-nums;text-align:right}
+  tr.emph td{font-weight:600}
+  .pass{color:var(--pass)}
+
+  /* -- datasheet as a ruled table -------------------------------------- */
+  .spec{display:grid;grid-template-columns:minmax(8rem,11rem) 1fr;gap:0 1.2rem;
+    margin:0 0 1.4rem;font-size:.92rem;
+    border-top:2px solid var(--rule-strong);border-bottom:2px solid var(--rule-strong)}
+  .spec dt{font-family:var(--sans);font-size:.72rem;letter-spacing:.05em;
+    text-transform:uppercase;color:var(--ink-faint);font-weight:600;
+    padding:.55rem 0 .5rem;line-height:1.55}
+  .spec dd{margin:0;padding:.5rem 0 .5rem}
+  .spec dt,.spec dd{border-bottom:1px solid var(--rule)}
+  .spec dt:nth-last-of-type(1),.spec dd:last-of-type{border-bottom:none}
   .spec b{font-weight:600}
   @media (max-width:30rem){
-    .spec{grid-template-columns:1fr;gap:.15rem}
-    .spec dd{margin-bottom:.7rem}
+    .spec{grid-template-columns:1fr;gap:0}
+    .spec dt{border-bottom:none;padding-bottom:.05rem}
   }
-  .term{margin:1.4rem 0;background:var(--panel);border:1px solid var(--rule);border-radius:6px;overflow:hidden}
-  .term-h{font-family:var(--sans);font-size:.72rem;color:var(--ink-faint);padding:.5rem 1rem;
-    border-bottom:1px solid var(--rule);letter-spacing:.03em}
-  .term-b{font-family:var(--mono);font-size:.72rem;line-height:1.9;padding:.8rem 1rem;
-    overflow-x:auto;color:var(--ink-soft)}
+
+  /* -- listing ---------------------------------------------------------- */
+  .term{background:var(--panel);border:1px solid var(--rule);border-radius:4px;
+    overflow:hidden;margin:0 0 1.4rem}
+  .term-b{font-family:var(--mono);font-size:.72rem;line-height:1.85;
+    padding:.85rem 1rem;overflow-x:auto;color:var(--ink-soft)}
   .term-b .l{white-space:pre}
-  .term-b .p{color:var(--accent)} .term-b .e{color:#b5482f} .term-b .g{color:var(--pass)} .term-b .c{color:var(--ink-faint)}
-  @media (prefers-color-scheme:dark){.term-b .e{color:#e07a5f}}
-  .tabwrap{overflow-x:auto;margin:1.4rem 0}
-  table{border-collapse:collapse;width:100%;font-family:var(--sans);font-size:.83rem}
-  caption{caption-side:top;text-align:left;font-size:.72rem;color:var(--ink-soft);padding:0 0 .55rem}
-  caption b{color:var(--ink)}
-  th,td{text-align:left;padding:.55rem .8rem;border-bottom:1px solid var(--rule)}
-  thead th{font-size:.64rem;letter-spacing:.06em;text-transform:uppercase;color:var(--ink-faint);font-weight:600}
-  .num{font-variant-numeric:tabular-nums;text-align:right}
-  tr.emph td{background:var(--accent-soft);font-weight:600}
-  .pass{color:var(--pass)}
-  .foot{margin-top:3rem;padding-top:1.2rem;border-top:1px solid var(--rule);
-    font-size:.85rem;color:var(--ink-faint)}
-  .foot p{margin:.6rem 0 0}
+  .term-b .p{color:var(--accent)} .term-b .e{color:var(--err)}
+  .term-b .g{color:var(--pass)} .term-b .c{color:var(--ink-faint)}
+
+  footer{margin-top:3.2rem;padding-top:1.3rem;border-top:1px solid var(--rule-strong);
+    font-family:var(--sans);font-size:.82rem;color:var(--ink-faint)}
+  footer p{margin:0 0 .55rem}
 </style>
 </head>
 <body>
 <div class="wrap">
 
-  <div class="eyebrow">lfs-rl · project overview</div>
-
-  <h1>Verifiable debugging tasks for training and evaluating agents, derived from failures <strong>Claude Fable 5</strong> made in real operation.</h1>
+  <header>
+    <div class="eyebrow">lfs-rl</div>
+    <h1>Verifiable debugging tasks for training and evaluating agents, derived from failures <strong>Claude Fable 5</strong> made in real operation.</h1>
+    <p class="meta">Working document · August 2026</p>
+    <div class="rule2"></div>
+  </header>
 
   <p>We operated Claude Fable 5 as the administrator of a real Linux system over several months and recorded its failures. The model rarely failed to repair a problem it had been given. It failed to <strong>notice that something was wrong at all</strong>, often hours after the original mistake and with the evidence pointing elsewhere. The tasks are constructed directly from those recorded failures.</p>
 
@@ -83,8 +125,8 @@
 
   <p>Every task is graded by the same procedure. A program is compiled and run inside the repaired system, and it either produces the correct output or it does not. No judge model is involved, and there is no answer string to match. The grading also resists gaming. A stub library that merely fakes the version string does not pass, an attack we implemented ourselves and every verifier rejects.</p>
 
+  <p class="cap"><b>Listing 1.</b> An example episode, a cross-package fault (symptom in one package, cause in another).</p>
   <div class="term">
-    <div class="term-h">Example episode. A cross-package fault (symptom in one package, cause in another)</div>
     <div class="term-b">
 <div class="l"><span class="p">$</span> chroot /mnt/lfs make -C /sources/kmod-34.2</div>
 <div class="l"><span class="e">/usr/bin/ld: undefined reference to `gzread'</span>  <span class="c"># symptom, kmod won't link</span></div>
@@ -95,15 +137,19 @@
     </div>
   </div>
 
-  <h2 class="sec">A suite of three task classes</h2>
+  <h2><span class="n">1</span>A suite of three environments</h2>
 
-  <p>The project is best read as a suite rather than a single environment. Its three task classes share the same agent-facing contract (a shell, one command per turn) and the same functional grading, but they run on different substrates and are trained or evaluated separately. A training or evaluation job selects which classes it draws from, and nothing mixes them by default. The classes sit at different stages of maturity, and only the first has measured results.</p>
+  <p>The project is a suite of three RL environments rather than a single environment. The three share the same agent-facing contract (a shell, one command per turn) and the same functional grading, but they run on different substrates and are trained or evaluated separately. A training or evaluation job selects which environments it draws from, and nothing mixes them by default. The environments sit at different stages of maturity, and only the first has measured results.</p>
 
-  <p><strong>Short-horizon repair, evaluated.</strong> The agent is told which package is broken and must diagnose and repair it, one shell command per turn. The set holds 74 instances across five library packages, including a group in which the evidence is misleading and the error output implicates the wrong component. Each instance is machine-verified before it enters, the reference fix must pass the verifier and a naive rebuild must not. A Qwen2.5-3B model trains end-to-end on this tier, and the table below reports full-solve on the trained faults at each stage, no training, then supervised warm-start, then GRPO. The central finding is that adding more training faults alone produced no transfer, the model reproduced what it was shown without learning to diagnose. Transfer appeared only after the demonstrations were redesigned so that every trajectory shows the discriminating check and continues based on its visible output. With that design, full-solve on held-out instances went from 0% base to 33% after supervised fine-tuning to 58% after a five-round GRPO probe. A frontier model solves a representative subset of these scoped tasks zero-shot in 7 to 18 commands, each pass confirmed by the verifier rather than self-reported, so this tier's present value is the training and evaluation of open models.</p>
+  <div class="kick">Environment 1 of 3</div>
+  <h2><span class="n">2</span>Short-horizon repair</h2>
+  <p class="status"><b>Status</b> &nbsp;Trained and evaluated. Every measured result on this page comes from this environment.</p>
 
+  <p>The agent is told which package is broken and must diagnose and repair it, one shell command per turn. The set holds 74 instances across five library packages, including a group in which the evidence is misleading and the error output implicates the wrong component. Each instance is machine-verified before it enters, the reference fix must pass the verifier and a naive rebuild must not. A Qwen2.5-3B model trains end-to-end on this environment, and Table&nbsp;1 reports full-solve on the trained faults at each stage, no training, then supervised warm-start, then GRPO. The central finding is that adding more training faults alone produced no transfer, the model reproduced what it was shown without learning to diagnose. Transfer appeared only after the demonstrations were redesigned so that every trajectory shows the discriminating check and continues based on its visible output. With that design, full-solve on held-out instances went from 0% base to 33% after supervised fine-tuning to 58% after a five-round GRPO probe. A frontier model solves a representative subset of these scoped tasks zero-shot in 7 to 18 commands, each pass confirmed by the verifier rather than self-reported, so this environment's present value is the training and evaluation of open models.</p>
+
+  <p class="cap"><b>Table 1.</b> Training performance in the short-horizon environment. Binary full-solve on the 18 trained faults, Qwen2.5-3B (the repaired system must run correctly, not merely build). One rollout per fault. The gain from base to GRPO is significant (paired p&nbsp;=&nbsp;0.004) and corroborated by training-time pass rates, while the step from warm-start to GRPO alone is directional, not precise.</p>
   <div class="tabwrap">
     <table>
-      <caption><b>Training performance, short-horizon tier.</b> Binary full-solve on the 18 trained faults, Qwen2.5-3B (the repaired system must run correctly, not merely build). One rollout per fault. The gain from base to GRPO is significant (paired p&nbsp;=&nbsp;0.004) and corroborated by training-time pass rates, while the step from warm-start to GRPO alone is directional, not precise.</caption>
       <thead><tr><th>Training stage</th><th class="num">Full-solve, trained faults</th></tr></thead>
       <tbody>
         <tr><td>Base model, no training</td><td class="num">0 / 18 (0%)</td></tr>
@@ -113,11 +159,13 @@
     </table>
   </div>
 
-  <p><strong>Long-horizon localization, built but not yet evaluated.</strong> A fault is planted in one package, the build continues normally, and the breakage surfaces up to fourteen packages later. The agent is told nothing about where to look. Four instances pass every machine check, spanning two fault mechanisms, a corrupted artifact consumed downstream and a configuration lie the downstream package silently acts on. No model has been trained or systematically evaluated on this tier. A single frontier calibration episode is the only measurement to date.</p>
+  <div class="kick">Environment 2 of 3</div>
+  <h2><span class="n">3</span>Long-horizon localization</h2>
+  <p class="status"><b>Status</b> &nbsp;Built and machine-verified. One frontier calibration episode. No training or systematic evaluation yet.</p>
 
-  <p><strong>Ops-derived procedural tasks, built but not yet evaluated.</strong> Two task families derived from a single real incident, recorded while a frontier model operated a live Linux system. Neither involves injected sabotage. In the first, the agent holds an upgrade script written for a chroot and must apply a security update to the running system. Reusing the script's in-place install on the new version replaces a library the running shell still depends on and leaves the machine unusable. In the second, an upgrade wrapper completes its work correctly and then reports failure, because its own verification step loses a scheduling race. The agent must show the system is healthy, repair the check so the race is gone, and inspect sibling scripts for the same defect. Each family passes its own machine gate (four checked end states for the first, six for the second, and every case triggers exactly the check intended for it). Like the long-horizon tier, they have no model results yet.</p>
+  <p>A fault is planted in one package, the build continues normally, and the breakage surfaces up to fourteen packages later. The agent is told nothing about where to look. Four instances pass every machine check, spanning two fault mechanisms, a corrupted artifact consumed downstream and a configuration lie the downstream package silently acts on. A single frontier calibration episode is the only measurement to date.</p>
 
-  <h2 class="sec">The long-horizon tier in numbers</h2>
+  <p class="cap"><b>Table 2.</b> The long-horizon environment in numbers.</p>
   <dl class="spec">
     <dt>Tasks verified</dt>
     <dd><b>4</b>, each passing 3 machine-checked properties (the fault causes a verified failure, repairing only the package where the symptom appears does not pass, repairing the true cause does)</dd>
@@ -138,13 +186,19 @@
     <dd>Claude Fable 5 solved the <em>easiest</em> instance in <b>24 of the 40</b> permitted commands, through genuine diagnosis rather than a memorized repair</dd>
 
     <dt>Model results</dt>
-    <dd><b>none yet</b>, no training run and no multi-sample evaluation has been performed on this tier</dd>
+    <dd><b>none yet</b>, no training run and no multi-sample evaluation has been performed on this environment</dd>
   </dl>
 
-  <h2 class="sec">Environment properties</h2>
+  <div class="kick">Environment 3 of 3</div>
+  <h2><span class="n">4</span>Ops-derived procedural tasks</h2>
+  <p class="status"><b>Status</b> &nbsp;Built and machine-verified. No model has attempted these tasks yet.</p>
+
+  <p>Two task families derived from a single real incident, recorded while a frontier model operated a live Linux system. Neither involves injected sabotage. In the first, the agent holds an upgrade script written for a chroot and must apply a security update to the running system. Reusing the script's in-place install on the new version replaces a library the running shell still depends on and leaves the machine unusable. In the second, an upgrade wrapper completes its work correctly and then reports failure, because its own verification step loses a scheduling race. The agent must show the system is healthy, repair the check so the race is gone, and inspect sibling scripts for the same defect. Each family passes its own machine gate (four checked end states for the first, six for the second, and every case triggers exactly the check intended for it).</p>
+
+  <h2><span class="n">5</span>Properties shared across the suite</h2>
   <dl class="spec">
     <dt>Format</dt>
-    <dd>the short-horizon class is packaged as a <code>verifiers</code> environment and validated end-to-end against a live model endpoint</dd>
+    <dd>the short-horizon environment is packaged as a <code>verifiers</code> environment and validated end-to-end against a live model endpoint</dd>
 
     <dt>Determinism</dt>
     <dd>the same seed reproduces the same fault and the same verifier</dd>
@@ -159,14 +213,14 @@
     <dd>faults are parameterized over the package, so adding a library reuses the whole taxonomy for one small verifier and one entry</dd>
   </dl>
 
-  <h2 class="sec">Design basis</h2>
+  <h2><span class="n">6</span>Design basis</h2>
 
   <p>The environment follows three published designs. <a href="https://arxiv.org/abs/2511.07317">RLVE</a> matches task difficulty to the model being trained. That principle is applied now and is the reason distance is a parameter. <a href="https://arxiv.org/abs/2607.14171">BPO</a> forks rollouts from sandbox snapshots. It is the reason the substrate can fork an episode at any package instead of rebuilding from scratch. <a href="https://arxiv.org/abs/2607.13988">TRACE</a> assigns credit to individual steps of a long task. Its adaptation to our state-based grading is worked out and waits for training to begin.</p>
 
-  <div class="foot">
+  <footer>
     <p>lfs-rl is intended for teams and platforms that train or evaluate open models on agentic, coding, or operations tasks, and for RL-environment marketplaces that require verifiable, hard-to-game rewards.</p>
     <p>The environment and its full results remain in a private repository. This page is the standing summary of what exists, what has been measured, and what has not.</p>
-  </div>
+  </footer>
 
 </div>
 </body>
