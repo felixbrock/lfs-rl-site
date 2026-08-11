@@ -4,7 +4,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
 <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16'><text y='13' font-size='13'>%F0%9F%94%A7</text></svg>">
-<title>lfs-rl, verifiable debugging environments built from Claude Fable 5 failures</title>
+<title>lfs-rl, verifiable debugging environments derived from Claude Fable 5 failures</title>
 <style>
   :root{
     --paper:#fcfcfb; --ink:#1b1d21; --ink-soft:#474b54; --ink-faint:#868b95;
@@ -56,11 +56,11 @@
 
   <div class="eyebrow">lfs-rl · project overview</div>
 
-  <h1>Verifiable debugging tasks for training and evaluating agents, built from mistakes <strong>Claude Fable 5</strong> actually made.</h1>
+  <h1>Verifiable debugging tasks for training and evaluating agents, derived from failures <strong>Claude Fable 5</strong> made in real operation.</h1>
 
-  <p>We ran Fable 5 as the operator of a real Linux system for months and recorded where it went wrong. It rarely failed at fixing a problem it had been handed. It failed at <strong>noticing something was wrong at all</strong>, hours after the actual mistake, with the evidence pointing somewhere else. Those recorded mistakes are what the tasks are made of.</p>
+  <p>We operated Claude Fable 5 as the administrator of a real Linux system over several months and recorded its failures. The model rarely failed to repair a problem it had been given. It failed to <strong>notice that something was wrong at all</strong>, often hours after the original mistake and with the evidence pointing elsewhere. The tasks are constructed directly from those recorded failures.</p>
 
-  <p>Every task is graded the same way. A program is compiled and run inside the repaired system, and it either produces the right output or it does not. There is no judge model and no answer string to match.</p>
+  <p>Every task is graded by the same procedure. A program is compiled and run inside the repaired system, and it either produces the correct output or it does not. No judge model is involved, and there is no answer string to match.</p>
 
   <h2 class="sec">Three task classes</h2>
 
