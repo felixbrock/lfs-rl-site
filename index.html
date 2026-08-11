@@ -191,9 +191,11 @@
 
   <div class="kick">Environment 3 of 3</div>
   <h2><span class="n">4</span>Ops-derived procedural tasks</h2>
-  <p class="status"><b>Status</b> &nbsp;Built and machine-verified. No model has attempted these tasks yet.</p>
+  <p class="status"><b>Status</b> &nbsp;Built and machine-verified. One frontier calibration episode on the false-failure family. The live-install family has no model attempts yet.</p>
 
   <p>Two task families derived from a single real incident, recorded while a frontier model operated a live Linux system. Neither involves injected sabotage. In the first, the agent holds an upgrade script written for a chroot and must apply a security update to the running system. Reusing the script's in-place install on the new version replaces a library the running shell still depends on and leaves the machine unusable. In the second, an upgrade wrapper completes its work correctly and then reports failure, because its own verification step loses a scheduling race. The agent must show the system is healthy, repair the check so the race is gone, and inspect sibling scripts for the same defect. Each family passes its own machine gate (four checked end states for the first, six for the second, and every case triggers exactly the check intended for it).</p>
+
+  <p><strong>Frontier baseline, false-failure family.</strong> In a single harness-scored episode, Claude Fable 5 solved the task in <strong>11 of the 40</strong> permitted commands. It verified the system state before acting, reproduced the race statistically (300 of 300 runs, with per-stage pipe statuses), repaired all three affected scripts with a fix different in shape from our reference, and left the deliberate decoy untouched, with the pass verdict issued by the machine gates against the preserved end state rather than taken from the agent's report. The episode also exposed two over-strict detectors in the family's own verifier, which were corrected, re-proven load-bearing by the full gate suite, and are recorded in the project results.</p>
 
   <h2><span class="n">5</span>Properties shared across the suite</h2>
   <dl class="spec">
