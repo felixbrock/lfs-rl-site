@@ -62,13 +62,15 @@
 
   <p>Every task is graded the same way. A program is compiled and run inside the repaired system, and it either produces the right output or it does not. There is no judge model and no answer string to match.</p>
 
-  <h2 class="sec">Two task tiers</h2>
+  <h2 class="sec">Three task classes</h2>
 
-  <p>The project has two tiers, and they sit at different stages. The distinction matters because one tier has measured results and the other does not yet.</p>
+  <p>The project's tasks fall into three classes, and they sit at different stages. The distinction matters because only the first class has measured results.</p>
 
   <p><strong>Short-horizon repair, evaluated.</strong> The agent is told which package is broken and must diagnose and repair it, one shell command per turn. The set holds 74 instances, each machine-proven solvable and biting before it enters. A Qwen2.5-3B trains end-to-end on this tier, going from 0% full-solve to 50% on trained faults, and a redesigned demonstration set produced genuine transfer to held-out instances (0% base, 33% supervised, 58% after a five-round GRPO probe).</p>
 
   <p><strong>Long-horizon localization, built but not yet evaluated.</strong> A fault is planted in one package, the build continues normally, and the breakage surfaces up to fourteen packages later. The agent is told nothing about where to look. Three instances pass every machine check, but no model has been trained or systematically evaluated on this tier. One frontier calibration episode is the only measurement so far.</p>
+
+  <p><strong>Ops-derived procedural tasks, built but not yet evaluated.</strong> Two task families mined from a single real incident, recorded while a frontier model operated a live Linux system. Neither involves injected sabotage. In one, the agent holds an upgrade script written for a chroot and must apply a security update to the running system, where carrying the script's in-place install over to the new version replaces a library out from under the running shell and bricks the machine. In the other, an upgrade wrapper does its job perfectly and then declares failure, because its own verification line loses a scheduling race, and the agent must prove the system healthy, fix the flake race-free, and sweep sibling scripts for the same landmine. Each family passes its own machine gate (four checked end states for the first, six for the second, every case tripping exactly the gate meant for it). Like the long-horizon tier, they have no model results yet.</p>
 
   <h2 class="sec">The long-horizon tier in numbers</h2>
   <dl class="spec">
