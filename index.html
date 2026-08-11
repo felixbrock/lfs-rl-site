@@ -5,16 +5,18 @@
 <meta name="viewport" content="width=device-width,initial-scale=1">
 <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16'><text y='13' font-size='13'>%F0%9F%94%A7</text></svg>">
 <title>lfs-rl, verifiable debugging environments derived from Claude Fable 5 failures</title>
+<meta name="description" content="An agent diagnoses and repairs a fault injected into a fully-built Linux system. The reward is a functional check run inside the repaired system, not a string match.">
 <style>
   :root{
-    --paper:#fcfcfb; --ink:#1b1d21; --ink-soft:#474b54; --ink-faint:#868b95;
-    --accent:#39598a; --accent-soft:#eaf0f7; --rule:#e5e5e1;
+    --paper:#fcfcfb; --panel:#ffffff; --ink:#1b1d21; --ink-soft:#474b54; --ink-faint:#868b95;
+    --accent:#39598a; --accent-soft:#eaf0f7; --pass:#2f7d4f; --rule:#e5e5e1; --code-bg:#f4f4f1;
     --serif:Georgia,"Iowan Old Style","Palatino Linotype","Times New Roman",serif;
     --sans:system-ui,-apple-system,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;
+    --mono:ui-monospace,"SF Mono",Menlo,Consolas,monospace;
   }
   @media (prefers-color-scheme:dark){:root{
-    --paper:#15171b; --ink:#e4e6ea; --ink-soft:#a6abb4; --ink-faint:#6d727b;
-    --accent:#88a8d2; --accent-soft:#1e2733; --rule:#2a2e35;}}
+    --paper:#15171b; --panel:#1c1f25; --ink:#e4e6ea; --ink-soft:#a6abb4; --ink-faint:#6d727b;
+    --accent:#88a8d2; --accent-soft:#1e2733; --pass:#57b87e; --rule:#2a2e35; --code-bg:#1f2329;}}
   *{box-sizing:border-box}
   body{margin:0;background:var(--paper);color:var(--ink);font-family:var(--serif);
     font-size:18px;line-height:1.65;-webkit-font-smoothing:antialiased}
@@ -30,6 +32,7 @@
   h1 strong{font-weight:inherit;color:var(--accent)}
   a{color:var(--accent);text-decoration:none;
     border-bottom:1px solid color-mix(in srgb,var(--accent) 35%,transparent)}
+  code{font-family:var(--mono);font-size:.86em;background:var(--code-bg);padding:1px 5px;border-radius:4px}
   h2.sec{font-family:var(--sans);font-size:.78rem;letter-spacing:.1em;
     text-transform:uppercase;color:var(--ink-faint);font-weight:600;
     margin:2.4rem 0 .9rem}
@@ -45,9 +48,16 @@
     .spec{grid-template-columns:1fr;gap:.15rem}
     .spec dd{margin-bottom:.7rem}
   }
+  .term{margin:1.4rem 0;background:var(--panel);border:1px solid var(--rule);border-radius:6px;overflow:hidden}
+  .term-h{font-family:var(--sans);font-size:.72rem;color:var(--ink-faint);padding:.5rem 1rem;
+    border-bottom:1px solid var(--rule);letter-spacing:.03em}
+  .term-b{font-family:var(--mono);font-size:.72rem;line-height:1.9;padding:.8rem 1rem;
+    overflow-x:auto;color:var(--ink-soft)}
+  .term-b .l{white-space:pre}
+  .term-b .p{color:var(--accent)} .term-b .e{color:#b5482f} .term-b .g{color:var(--pass)} .term-b .c{color:var(--ink-faint)}
+  @media (prefers-color-scheme:dark){.term-b .e{color:#e07a5f}}
   .foot{margin-top:3rem;padding-top:1.2rem;border-top:1px solid var(--rule);
     font-size:.85rem;color:var(--ink-faint)}
-  .foot a{margin-right:1.25rem}
   .foot p{margin:.6rem 0 0}
 </style>
 </head>
@@ -60,13 +70,25 @@
 
   <p>We operated Claude Fable 5 as the administrator of a real Linux system over several months and recorded its failures. The model rarely failed to repair a problem it had been given. It failed to <strong>notice that something was wrong at all</strong>, often hours after the original mistake and with the evidence pointing elsewhere. The tasks are constructed directly from those recorded failures.</p>
 
-  <p>Every task is graded by the same procedure. A program is compiled and run inside the repaired system, and it either produces the correct output or it does not. No judge model is involved, and there is no answer string to match.</p>
+  <p>Every task is graded by the same procedure. A program is compiled and run inside the repaired system, and it either produces the correct output or it does not. No judge model is involved, and there is no answer string to match. The grading also resists gaming. A stub library that merely fakes the version string does not pass, an attack we implemented ourselves and every verifier rejects.</p>
+
+  <div class="term">
+    <div class="term-h">Example episode. A cross-package fault (symptom in one package, cause in another)</div>
+    <div class="term-b">
+<div class="l"><span class="p">$</span> chroot /mnt/lfs make -C /sources/kmod-34.2</div>
+<div class="l"><span class="e">/usr/bin/ld: undefined reference to `gzread'</span>  <span class="c"># symptom, kmod won't link</span></div>
+<div class="l"><span class="p">$</span> ls -l /usr/lib/libz.so</div>
+<div class="l">libz.so -&gt; <span class="e">libbz2.so.1.0</span>  <span class="c"># cause, zlib's dev symlink is mispointed</span></div>
+<div class="l"><span class="p">$</span> ln -sf libz.so.1.3.1 /usr/lib/libz.so &amp;&amp; make &amp;&amp; make install</div>
+<div class="l"><span class="g">verifier: libkmod compiles, links, and runs (reward 1.0)</span></div>
+    </div>
+  </div>
 
   <h2 class="sec">Three task classes</h2>
 
   <p>The project's tasks fall into three classes at different stages of maturity. The distinction matters because only the first class has measured results.</p>
 
-  <p><strong>Short-horizon repair, evaluated.</strong> The agent is told which package is broken and must diagnose and repair it, one shell command per turn. The set holds 74 instances. Each is machine-verified before it enters, the reference fix must pass the verifier and a naive rebuild must not. A Qwen2.5-3B model trains end-to-end on this tier, improving from 0% to 50% full-solve on trained faults, and a redesigned demonstration set produced genuine transfer to held-out instances (0% base, 33% after supervised fine-tuning, 58% after a five-round GRPO probe).</p>
+  <p><strong>Short-horizon repair, evaluated.</strong> The agent is told which package is broken and must diagnose and repair it, one shell command per turn. The set holds 74 instances across five library packages, including a group in which the evidence is misleading and the error output implicates the wrong component. Each instance is machine-verified before it enters, the reference fix must pass the verifier and a naive rebuild must not. A Qwen2.5-3B model trains end-to-end on this tier, improving from 0% to 50% full-solve on trained faults (paired p&nbsp;=&nbsp;0.004). The central finding is that adding more training faults alone produced no transfer, the model reproduced what it was shown without learning to diagnose. Transfer appeared only after the demonstrations were redesigned so that every trajectory shows the discriminating check and continues based on its visible output. With that design, full-solve on held-out instances went from 0% base to 33% after supervised fine-tuning to 58% after a five-round GRPO probe. A frontier model solves a representative subset of these scoped tasks zero-shot in 7 to 18 commands, each pass confirmed by the verifier rather than self-reported, so this tier's present value is the training and evaluation of open models.</p>
 
   <p><strong>Long-horizon localization, built but not yet evaluated.</strong> A fault is planted in one package, the build continues normally, and the breakage surfaces up to fourteen packages later. The agent is told nothing about where to look. Three instances pass every machine check, but no model has been trained or systematically evaluated on this tier. A single frontier calibration episode is the only measurement to date.</p>
 
@@ -96,13 +118,31 @@
     <dd><b>none yet</b>, no training run and no multi-sample evaluation has been performed on this tier</dd>
   </dl>
 
+  <h2 class="sec">Environment properties</h2>
+  <dl class="spec">
+    <dt>Format</dt>
+    <dd>packaged as a <code>verifiers</code> environment and validated end-to-end against a live model endpoint</dd>
+
+    <dt>Determinism</dt>
+    <dd>the same seed reproduces the same fault and the same verifier</dd>
+
+    <dt>Cost</dt>
+    <dd>rootless sandbox, about <b>1.6 seconds</b> and 200 MB per episode, and a full training run cost about <b>$0.50</b> of GPU time</dd>
+
+    <dt>Isolation</dt>
+    <dd>the sandbox runs untrusted agent-generated shell behind an allow-list filesystem and a private loopback-only network, verified by writing markers into every host path from inside and confirming none reached the host</dd>
+
+    <dt>Scaling</dt>
+    <dd>faults are parameterized over the package, so adding a library reuses the whole taxonomy for one small verifier and one entry</dd>
+  </dl>
+
   <h2 class="sec">Design basis</h2>
 
   <p>The environment follows three published designs. <a href="https://arxiv.org/abs/2511.07317">RLVE</a> matches task difficulty to the model being trained. That principle is applied now and is the reason distance is a parameter. <a href="https://arxiv.org/abs/2607.14171">BPO</a> forks rollouts from sandbox snapshots. It is the reason the substrate can fork an episode at any package instead of rebuilding from scratch. <a href="https://arxiv.org/abs/2607.13988">TRACE</a> assigns credit to individual steps of a long task. Its adaptation to our state-based grading is worked out and waits for training to begin.</p>
 
   <div class="foot">
-    <a href="technical.html">Technical summary, methods and results</a>
-    <p>The environment and its full results remain in a private repository.</p>
+    <p>lfs-rl is intended for teams and platforms that train or evaluate open models on agentic, coding, or operations tasks, and for RL-environment marketplaces that require verifiable, hard-to-game rewards.</p>
+    <p>The environment and its full results remain in a private repository. This page is the standing summary of what exists, what has been measured, and what has not.</p>
   </div>
 
 </div>
