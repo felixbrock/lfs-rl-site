@@ -79,6 +79,8 @@
 
   <p>We operated Claude Fable 5 as the administrator of a real Linux system over several months and recorded its failures. The model rarely failed to repair a problem it had been given. It failed to <strong>notice that something was wrong at all</strong>, often hours after the original mistake and with the evidence pointing elsewhere. The tasks are constructed directly from those recorded failures.</p>
 
+  <p>This is work in progress. Additional failure modes are mined from continuing operation and added over time, and the page states at each point what is verified and what is not.</p>
+
   <p>Every task is graded by the same procedure. A program is compiled and run inside the repaired system, and it either produces the correct output or it does not. No judge model is involved, and there is no answer string to match. The grading also resists gaming. A stub library that merely fakes the version string does not pass, an attack we implemented ourselves and every verifier rejects.</p>
 
   <div class="term">
@@ -93,9 +95,9 @@
     </div>
   </div>
 
-  <h2 class="sec">Three task classes</h2>
+  <h2 class="sec">A suite of three task classes</h2>
 
-  <p>The project's tasks fall into three classes at different stages of maturity. The distinction matters because only the first class has measured results.</p>
+  <p>The project is best read as a suite rather than a single environment. Its three task classes share the same agent-facing contract (a shell, one command per turn) and the same functional grading, but they run on different substrates and are trained or evaluated separately. A training or evaluation job selects which classes it draws from, and nothing mixes them by default. The classes sit at different stages of maturity, and only the first has measured results.</p>
 
   <p><strong>Short-horizon repair, evaluated.</strong> The agent is told which package is broken and must diagnose and repair it, one shell command per turn. The set holds 74 instances across five library packages, including a group in which the evidence is misleading and the error output implicates the wrong component. Each instance is machine-verified before it enters, the reference fix must pass the verifier and a naive rebuild must not. A Qwen2.5-3B model trains end-to-end on this tier, and the table below reports full-solve on the trained faults at each stage, no training, then supervised warm-start, then GRPO. The central finding is that adding more training faults alone produced no transfer, the model reproduced what it was shown without learning to diagnose. Transfer appeared only after the demonstrations were redesigned so that every trajectory shows the discriminating check and continues based on its visible output. With that design, full-solve on held-out instances went from 0% base to 33% after supervised fine-tuning to 58% after a five-round GRPO probe. A frontier model solves a representative subset of these scoped tasks zero-shot in 7 to 18 commands, each pass confirmed by the verifier rather than self-reported, so this tier's present value is the training and evaluation of open models.</p>
 
@@ -142,7 +144,7 @@
   <h2 class="sec">Environment properties</h2>
   <dl class="spec">
     <dt>Format</dt>
-    <dd>packaged as a <code>verifiers</code> environment and validated end-to-end against a live model endpoint</dd>
+    <dd>the short-horizon class is packaged as a <code>verifiers</code> environment and validated end-to-end against a live model endpoint</dd>
 
     <dt>Determinism</dt>
     <dd>the same seed reproduces the same fault and the same verifier</dd>
