@@ -64,41 +64,41 @@
 
   <h2 class="sec">Three task classes</h2>
 
-  <p>The project's tasks fall into three classes, and they sit at different stages. The distinction matters because only the first class has measured results.</p>
+  <p>The project's tasks fall into three classes at different stages of maturity. The distinction matters because only the first class has measured results.</p>
 
-  <p><strong>Short-horizon repair, evaluated.</strong> The agent is told which package is broken and must diagnose and repair it, one shell command per turn. The set holds 74 instances, each machine-proven solvable and biting before it enters. A Qwen2.5-3B trains end-to-end on this tier, going from 0% full-solve to 50% on trained faults, and a redesigned demonstration set produced genuine transfer to held-out instances (0% base, 33% supervised, 58% after a five-round GRPO probe).</p>
+  <p><strong>Short-horizon repair, evaluated.</strong> The agent is told which package is broken and must diagnose and repair it, one shell command per turn. The set holds 74 instances. Each is machine-verified before it enters, the reference fix must pass the verifier and a naive rebuild must not. A Qwen2.5-3B model trains end-to-end on this tier, improving from 0% to 50% full-solve on trained faults, and a redesigned demonstration set produced genuine transfer to held-out instances (0% base, 33% after supervised fine-tuning, 58% after a five-round GRPO probe).</p>
 
-  <p><strong>Long-horizon localization, built but not yet evaluated.</strong> A fault is planted in one package, the build continues normally, and the breakage surfaces up to fourteen packages later. The agent is told nothing about where to look. Three instances pass every machine check, but no model has been trained or systematically evaluated on this tier. One frontier calibration episode is the only measurement so far.</p>
+  <p><strong>Long-horizon localization, built but not yet evaluated.</strong> A fault is planted in one package, the build continues normally, and the breakage surfaces up to fourteen packages later. The agent is told nothing about where to look. Three instances pass every machine check, but no model has been trained or systematically evaluated on this tier. A single frontier calibration episode is the only measurement to date.</p>
 
-  <p><strong>Ops-derived procedural tasks, built but not yet evaluated.</strong> Two task families mined from a single real incident, recorded while a frontier model operated a live Linux system. Neither involves injected sabotage. In one, the agent holds an upgrade script written for a chroot and must apply a security update to the running system, where carrying the script's in-place install over to the new version replaces a library out from under the running shell and bricks the machine. In the other, an upgrade wrapper does its job perfectly and then declares failure, because its own verification line loses a scheduling race, and the agent must prove the system healthy, fix the flake race-free, and sweep sibling scripts for the same landmine. Each family passes its own machine gate (four checked end states for the first, six for the second, every case tripping exactly the gate meant for it). Like the long-horizon tier, they have no model results yet.</p>
+  <p><strong>Ops-derived procedural tasks, built but not yet evaluated.</strong> Two task families derived from a single real incident, recorded while a frontier model operated a live Linux system. Neither involves injected sabotage. In the first, the agent holds an upgrade script written for a chroot and must apply a security update to the running system. Reusing the script's in-place install on the new version replaces a library the running shell still depends on and leaves the machine unusable. In the second, an upgrade wrapper completes its work correctly and then reports failure, because its own verification step loses a scheduling race. The agent must show the system is healthy, repair the check so the race is gone, and inspect sibling scripts for the same defect. Each family passes its own machine gate (four checked end states for the first, six for the second, and every case triggers exactly the check intended for it). Like the long-horizon tier, they have no model results yet.</p>
 
   <h2 class="sec">The long-horizon tier in numbers</h2>
   <dl class="spec">
     <dt>Tasks verified</dt>
-    <dd><b>3</b>, each passing 3 machine-checked properties (the fault bites, fixing the package where it surfaces is not enough, fixing the real cause works)</dd>
+    <dd><b>3</b>, each passing 3 machine-checked properties (the fault causes a verified failure, repairing only the package where the symptom appears does not pass, repairing the true cause does)</dd>
 
-    <dt>Built, then rejected</dt>
-    <dd><b>2 of 5</b>, thrown out by that same checker for failing a property</dd>
+    <dt>Rejected in verification</dt>
+    <dd><b>2 of 5</b>, removed by the same checker for failing one of those properties</dd>
 
     <dt>Distance, cause to symptom</dt>
     <dd><b>5, 5 and 14</b> packages</dd>
 
-    <dt>Difficulty is a dial</dt>
-    <dd>one fault family verified at <b>both</b> distance 5 and distance 14, so the axis is turned by a parameter, not by new design work</dd>
+    <dt>Difficulty control</dt>
+    <dd>one fault family is verified at <b>both</b> distance 5 and distance 14, so difficulty is set by a generator parameter rather than by new design work</dd>
 
-    <dt>Room to grow</dt>
+    <dt>Expansion capacity</dt>
     <dd><b>82</b> packages downstream of the seed point, each a possible symptom site</dd>
 
     <dt>Frontier baseline</dt>
-    <dd>Fable 5 solved the <em>easiest</em> task in <b>24 of 40</b> allowed commands, and needed real detective work rather than a known fix</dd>
+    <dd>Claude Fable 5 solved the <em>easiest</em> instance in <b>24 of the 40</b> permitted commands, through genuine diagnosis rather than a memorized repair</dd>
 
     <dt>Model results</dt>
-    <dd><b>none yet</b>, no training run and no multi-sample evaluation has touched this tier</dd>
+    <dd><b>none yet</b>, no training run and no multi-sample evaluation has been performed on this tier</dd>
   </dl>
 
-  <h2 class="sec">How it is built</h2>
+  <h2 class="sec">Design basis</h2>
 
-  <p>The environment follows three published designs. <a href="https://arxiv.org/abs/2511.07317">RLVE</a> keeps task difficulty matched to the model being trained, which is applied now and is why distance is a parameter. <a href="https://arxiv.org/abs/2607.14171">BPO</a> forks rollouts from sandbox snapshots, which is why the substrate can fork at any package instead of rebuilding from scratch. <a href="https://arxiv.org/abs/2607.13988">TRACE</a> assigns credit to individual steps of a long task, which is designed against our state-based grading and waits on training starting.</p>
+  <p>The environment follows three published designs. <a href="https://arxiv.org/abs/2511.07317">RLVE</a> matches task difficulty to the model being trained. That principle is applied now and is the reason distance is a parameter. <a href="https://arxiv.org/abs/2607.14171">BPO</a> forks rollouts from sandbox snapshots. It is the reason the substrate can fork an episode at any package instead of rebuilding from scratch. <a href="https://arxiv.org/abs/2607.13988">TRACE</a> assigns credit to individual steps of a long task. Its adaptation to our state-based grading is worked out and waits for training to begin.</p>
 
   <div class="foot">
     <a href="technical.html">Technical summary, methods and results</a>
