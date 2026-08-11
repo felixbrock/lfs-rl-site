@@ -120,17 +120,17 @@
     <dt>Tasks verified</dt>
     <dd><b>3</b>, each passing 3 machine-checked properties (the fault causes a verified failure, repairing only the package where the symptom appears does not pass, repairing the true cause does)</dd>
 
-    <dt>Rejected in verification</dt>
-    <dd><b>2 of 5</b>, removed by the same checker for failing one of those properties</dd>
+    <dt>Candidates rejected</dt>
+    <dd><b>2</b>, five candidate tasks have been built in total, and the checker removed the two that failed one of the three properties. The rejections are reported because they show the checker filters rather than approves everything.</dd>
 
-    <dt>Distance, cause to symptom</dt>
-    <dd><b>5, 5 and 14</b> packages</dd>
+    <dt>Cause-to-symptom distance</dt>
+    <dd>the number of packages built between the faulty package and the package where the build visibly fails. The three verified tasks measure <b>5, 5, and 14</b>.</dd>
 
     <dt>Difficulty control</dt>
     <dd>one fault family is verified at <b>both</b> distance 5 and distance 14, so difficulty is set by a generator parameter rather than by new design work</dd>
 
     <dt>Expansion capacity</dt>
-    <dd><b>82</b> packages downstream of the seed point, each a possible symptom site</dd>
+    <dd><b>82</b> packages are built downstream of the fault-injection point, each a possible site for the symptom to surface</dd>
 
     <dt>Frontier baseline</dt>
     <dd>Claude Fable 5 solved the <em>easiest</em> instance in <b>24 of the 40</b> permitted commands, through genuine diagnosis rather than a memorized repair</dd>
