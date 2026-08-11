@@ -4,7 +4,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
 <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16'><text y='13' font-size='13'>%F0%9F%94%A7</text></svg>">
-<title>lfs-rl, long-horizon debugging tasks built from Claude Fable 5 failures</title>
+<title>lfs-rl, verifiable debugging environments built from Claude Fable 5 failures</title>
 <style>
   :root{
     --paper:#fcfcfb; --ink:#1b1d21; --ink-soft:#474b54; --ink-faint:#868b95;
@@ -19,7 +19,7 @@
   body{margin:0;background:var(--paper);color:var(--ink);font-family:var(--serif);
     font-size:18px;line-height:1.65;-webkit-font-smoothing:antialiased}
   .wrap{max-width:34rem;margin:0 auto;padding:4.5rem 1.5rem 5rem}
-  h1,.eyebrow,.ask h2,.foot{font-family:var(--sans)}
+  h1,.eyebrow,.foot{font-family:var(--sans)}
   .eyebrow{font-size:.75rem;letter-spacing:.12em;text-transform:uppercase;
     color:var(--ink-faint);margin-bottom:.9rem}
   h1{font-size:1.7rem;line-height:1.3;margin:0 0 1.4rem;letter-spacing:-.01em}
@@ -45,29 +45,32 @@
     .spec{grid-template-columns:1fr;gap:.15rem}
     .spec dd{margin-bottom:.7rem}
   }
-  .ask{border:1px solid var(--rule);background:var(--accent-soft);
-    border-radius:6px;padding:1.3rem 1.4rem;margin:2rem 0 0}
-  .ask h2{margin:0 0 .6rem;font-size:.95rem;letter-spacing:.02em}
-  .ask p:last-child{margin-bottom:0}
   .foot{margin-top:3rem;padding-top:1.2rem;border-top:1px solid var(--rule);
     font-size:.85rem;color:var(--ink-faint)}
   .foot a{margin-right:1.25rem}
+  .foot p{margin:.6rem 0 0}
 </style>
 </head>
 <body>
 <div class="wrap">
 
-  <div class="eyebrow">lfs-rl · seeking compute sponsorship</div>
+  <div class="eyebrow">lfs-rl · project overview</div>
 
-  <h1>Debugging tasks where the damage is done early and the symptom appears much later, built from mistakes <strong>Claude Fable 5</strong> actually made.</h1>
+  <h1>Verifiable debugging tasks for training and evaluating agents, built from mistakes <strong>Claude Fable 5</strong> actually made.</h1>
 
   <p>We ran Fable 5 as the operator of a real Linux system for months and recorded where it went wrong. It rarely failed at fixing a problem it had been handed. It failed at <strong>noticing something was wrong at all</strong>, hours after the actual mistake, with the evidence pointing somewhere else. Those recorded mistakes are what the tasks are made of.</p>
 
-  <p>A fault is planted in one software package, the build continues normally, and the breakage surfaces up to fourteen packages later. The agent is told nothing about where to look. Grading is not a judgement call, because a program is compiled and run inside the repaired system, and it either produces the right output or it does not.</p>
+  <p>Every task is graded the same way. A program is compiled and run inside the repaired system, and it either produces the right output or it does not. There is no judge model and no answer string to match.</p>
 
-  <p><strong>Nobody knows how models perform on these.</strong> That is the point. The tasks are built and proven solvable, but they have never been run at scale. Long-horizon debugging is a known weak spot, and this measures it directly.</p>
+  <h2 class="sec">Two task tiers</h2>
 
-  <h2 class="sec">What exists today</h2>
+  <p>The project has two tiers, and they sit at different stages. The distinction matters because one tier has measured results and the other does not yet.</p>
+
+  <p><strong>Short-horizon repair, evaluated.</strong> The agent is told which package is broken and must diagnose and repair it, one shell command per turn. The set holds 74 instances, each machine-proven solvable and biting before it enters. A Qwen2.5-3B trains end-to-end on this tier, going from 0% full-solve to 50% on trained faults, and a redesigned demonstration set produced genuine transfer to held-out instances (0% base, 33% supervised, 58% after a five-round GRPO probe).</p>
+
+  <p><strong>Long-horizon localization, built but not yet evaluated.</strong> A fault is planted in one package, the build continues normally, and the breakage surfaces up to fourteen packages later. The agent is told nothing about where to look. Three instances pass every machine check, but no model has been trained or systematically evaluated on this tier. One frontier calibration episode is the only measurement so far.</p>
+
+  <h2 class="sec">The long-horizon tier in numbers</h2>
   <dl class="spec">
     <dt>Tasks verified</dt>
     <dd><b>3</b>, each passing 3 machine-checked properties (the fault bites, fixing the package where it surfaces is not enough, fixing the real cause works)</dd>
@@ -84,29 +87,20 @@
     <dt>Room to grow</dt>
     <dd><b>82</b> packages downstream of the seed point, each a possible symptom site</dd>
 
-    <dt>Grading</dt>
-    <dd>a program is compiled and run inside the repaired system, so there is no judge model and no answer string to match</dd>
-
     <dt>Frontier baseline</dt>
     <dd>Fable 5 solved the <em>easiest</em> task in <b>24 of 40</b> allowed commands, and needed real detective work rather than a known fix</dd>
 
-    <dt>Spent so far</dt>
-    <dd>under <b>$20</b> of GPU time, on one laptop</dd>
+    <dt>Model results</dt>
+    <dd><b>none yet</b>, no training run and no multi-sample evaluation has touched this tier</dd>
   </dl>
 
   <h2 class="sec">How it is built</h2>
 
   <p>The environment follows three published designs. <a href="https://arxiv.org/abs/2511.07317">RLVE</a> keeps task difficulty matched to the model being trained, which is applied now and is why distance is a parameter. <a href="https://arxiv.org/abs/2607.14171">BPO</a> forks rollouts from sandbox snapshots, which is why the substrate can fork at any package instead of rebuilding from scratch. <a href="https://arxiv.org/abs/2607.13988">TRACE</a> assigns credit to individual steps of a long task, which is designed against our state-based grading and waits on training starting.</p>
 
-  <div class="ask">
-    <h2>The ask</h2>
-    <p>GPU compute to find out. A first meaningful run is about <strong>$300</strong>, a full programme a few thousand.</p>
-    <p>The environment, the fault generator and the grading already work. What is missing is the compute to run models against them.</p>
-  </div>
-
   <div class="foot">
-    <a href="https://github.com/felixbrock/lfs-rl">Code and results</a>
-    <a href="technical.html">Technical detail</a>
+    <a href="technical.html">Technical summary, methods and results</a>
+    <p>The environment and its full results remain in a private repository.</p>
   </div>
 
 </div>
