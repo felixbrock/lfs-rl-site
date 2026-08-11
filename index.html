@@ -121,7 +121,7 @@
     <dd><b>4</b>, each passing 3 machine-checked properties (the fault causes a verified failure, repairing only the package where the symptom appears does not pass, repairing the true cause does)</dd>
 
     <dt>Candidates rejected</dt>
-    <dd><b>2</b> of the 6 candidate tasks built to date, removed by the checker for failing one of the three properties. The rejections are reported because they show the checker filters rather than approves everything. Both were driven to conclusions, one retired for a measured structural reason, and one re-homed onto a mechanism its downstream package actually reads, which then passed all three properties.</dd>
+    <dd><b>2</b> of the 6 candidate tasks built to date failed one of the three properties and were removed, and the other 4 are the verified set above, so no candidate is pending. The rejections are reported because they show the checker filters rather than approves everything. Both rejected candidates are closed. One is retired because measurement showed no seed of its kind can work on this substrate. The other's mechanism was rebuilt as a new candidate against a package that actually reads the lied-about value, and that new candidate is among the 4 verified.</dd>
 
     <dt>Cause-to-symptom distance</dt>
     <dd>the number of packages built between the faulty package and the package where the build visibly fails. The four verified tasks measure <b>5, 5, 14, and 3</b>.</dd>
