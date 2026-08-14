@@ -103,10 +103,6 @@
   .term-b .l{white-space:pre}
   .term-b .p{color:var(--accent)} .term-b .e{color:var(--err)}
   .term-b .g{color:var(--pass)} .term-b .c{color:var(--ink-faint)}
-
-  footer{margin-top:3.2rem;padding-top:1.3rem;border-top:1px solid var(--rule-strong);
-    font-family:var(--sans);font-size:.82rem;color:var(--ink-faint)}
-  footer p{margin:0 0 .55rem}
 </style>
 </head>
 <body>
@@ -218,11 +214,6 @@
   <h2><span class="n">6</span>Design basis</h2>
 
   <p>The environment follows three published designs. <a href="https://arxiv.org/abs/2511.07317">RLVE</a> matches task difficulty to the model being trained. That principle is applied now and is the reason distance is a parameter. <a href="https://arxiv.org/abs/2607.14171">BPO</a> forks rollouts from sandbox snapshots. It is the reason the substrate can fork an episode at any package instead of rebuilding from scratch. <a href="https://arxiv.org/abs/2607.13988">TRACE</a> assigns credit to individual steps of a long task. Its adaptation to our state-based grading is worked out and waits for training to begin.</p>
-
-  <footer>
-    <p>lfs-rl is intended for teams and platforms that train or evaluate open models on agentic, coding, or operations tasks, and for RL-environment marketplaces that require verifiable, hard-to-game rewards.</p>
-    <p>The environment and its full results remain in a private repository. This page is the standing summary of what exists, what has been measured, and what has not.</p>
-  </footer>
 
 </div>
 </body>
