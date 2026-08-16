@@ -3,6 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="color-scheme" content="light only">
 <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16'><text y='13' font-size='13'>%F0%9F%94%A7</text></svg>">
 <title>lfs-rl, verifiable debugging environments derived from Claude Fable 5 failures</title>
 <meta name="description" content="An agent diagnoses and repairs a fault injected into a fully-built Linux system. The reward is a functional check run inside the repaired system, not a string match.">
@@ -18,11 +19,8 @@
     --sans:"IBM Plex Sans","Segoe UI",system-ui,sans-serif;
     --mono:ui-monospace,"SF Mono",Menlo,Consolas,monospace;
   }
-  @media (prefers-color-scheme:dark){:root{
-    --paper:#1a1816; --panel:#201e1b; --ink:#e9e4da; --ink-soft:#aeaaa0; --ink-faint:#767268;
-    --accent:#d4949a; --rule:#343129; --rule-strong:#bab5aa; --code-bg:#252220; --pass:#6cbd8c;
-    --err:#e08573;}}
   *{box-sizing:border-box}
+  :root{color-scheme:light}
   body{margin:0;background:var(--paper);color:var(--ink);font-family:var(--serif);
     font-size:17.5px;line-height:1.68;-webkit-font-smoothing:antialiased}
   .wrap{max-width:41rem;margin:0 auto;padding:4rem 1.4rem 5rem}
