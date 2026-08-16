@@ -157,6 +157,10 @@
     .spec dt{border-bottom:none;padding-bottom:.05rem}
   }
 
+  footer{margin-top:2.8rem;padding-top:1.1rem;border-top:1px solid var(--rule);
+    font-family:var(--sans);font-size:.78rem;color:var(--ink-soft)}
+  footer p{margin:0}
+
   /* -- listing ---------------------------------------------------------- */
   .term{background:var(--panel);border:1px solid var(--rule);border-radius:4px;
     overflow:hidden;margin:0 0 1.4rem}
@@ -186,10 +190,10 @@
 
   <p>We operated Claude Fable 5 as the administrator of a real Linux system over several months and recorded its failures. The model rarely failed to repair a problem it had been given. It failed to <strong>notice that something was wrong at all</strong>. Every task below is constructed from a recorded failure, and every task is graded the same way. A program is compiled and run inside the repaired system, and it either produces the correct output or it does not. There is no judge model and no answer string to match, and a stub library that merely fakes the version string does not pass.</p>
 
-  <p><strong>The central measured result.</strong> The failure needs two signals to be missing at once. When nothing states that circumstances have changed, and the hazardous task arrives as one item in a routine work queue, the model walks into its own recorded incident. Either signal alone prevented the mistake in every scored episode. Figure&nbsp;1 shows the completed contrast, twenty-five fresh-context episodes replaying the model's worst incident under controlled conditions.</p>
+  <p><strong>The central measured result.</strong> In the replay of the model's worst incident, the failure appeared only when two signals were missing at once. When nothing stated that circumstances had changed, and the hazardous task arrived as one item in a routine work queue, the model walked into its own recorded incident, and either signal alone prevented the mistake in every scored episode. Figure&nbsp;1 shows the contrast, twenty-five fresh-context episodes on one deterministic fault scored in one day, so it measures sensitivity to those cues in this fixture, not a general law of long-context agents (Section&nbsp;6).</p>
 
   <figure class="fig">
-    <figcaption class="cap"><b>Figure 1.</b> One dot per scored Claude Fable 5 episode, five arms on one deterministic fault. Hollow green (<span class="dot h" style="width:9px;height:9px;margin:0 1px"></span>), the agent held and never opened the dangerous window. Solid red (<span class="dot f" style="width:9px;height:9px;margin:0 1px"></span>), it reproduced the incident and the system could not start a new process until repaired from outside. Failures appear only where both signals are absent, 3 of 5 in the first run and 5 of 5 in a rerun with every known fixture confound removed.</figcaption>
+    <figcaption class="cap"><b>Figure 1.</b> One dot per scored Claude Fable 5 episode, five arms on one deterministic fault. Hollow green (<span class="dot h" style="width:9px;height:9px;margin:0 1px"></span>), the agent held and never opened the dangerous window. Solid red (<span class="dot f" style="width:9px;height:9px;margin:0 1px"></span>), it reproduced the incident and the system could not start a new process until repaired from outside. Failures appear only where both signals are absent, 3 of 5 in the first run and 5 of 5 in a rerun with every known fixture confound removed. Arms of five carry wide uncertainty, an exact 95% interval on 5 of 5 spans roughly 48% to 100%, and a 0 of 5 arm does not establish a near-zero failure rate.</figcaption>
     <div class="g22">
       <div></div>
       <div class="ch">Task points at the hazard</div>
@@ -217,7 +221,7 @@
     </div>
   </figure>
 
-  <p>The deficit is not knowledge and not procedure. It is self-initiated re-verification of a stale assumption when nothing prompts it. This page is a working document, and it states at each point what is verified and what is not.</p>
+  <p>The deficit these arms measure is not knowledge and not procedure. The reading the data supports is that safety information which is unstated or buried is often not routed into the decision. The stronger claim, that the model cannot distrust its own history, is not isolated here, because the arm with its own success minutes old in context passed 5 of 5 once the change was announced. This page is a working document, and it states at each point what is verified and what is not.</p>
 
   <p class="cap"><b>Listing 1.</b> An example episode, a cross-package fault (symptom in one package, cause in another).</p>
   <div class="term">
@@ -253,7 +257,7 @@
   <p>The agent is told which package is broken and must repair it. The set holds 74 machine-verified instances across five library packages, including a group whose error output implicates the wrong component. A Qwen2.5-3B model trains end to end on this environment. Adding more training faults alone produced no transfer, the model reproduced what it was shown. Transfer appeared only after every demonstration was redesigned to show the discriminating check and continue from its visible output. A frontier model already solves a representative subset zero-shot in 7 to 18 commands, so the environment's present value is training and evaluating open models.</p>
 
   <figure class="fig">
-    <figcaption class="cap"><b>Figure 2.</b> Full-solve rate by training stage, one rollout per fault (the repaired system must run correctly, not merely build). The base-to-GRPO gain on trained faults is significant (paired p&nbsp;=&nbsp;0.004), the warm-start-to-GRPO step alone is directional.</figcaption>
+    <figcaption class="cap"><b>Figure 2.</b> Full-solve rate by training stage, one training run and one rollout per fault (the repaired system must run correctly, not merely build). The paired p&nbsp;=&nbsp;0.004 compares base to GRPO on the 18 trained faults only, the warm-start-to-GRPO step alone is directional, and the held-out percentages are point estimates whose counts and per-task breakdown are not yet published (Section&nbsp;6).</figcaption>
     <div class="leg">
       <span><span class="sw" style="background:var(--ink-faint)"></span>Trained faults (18)</span>
       <span><span class="sw" style="background:var(--accent)"></span>Held-out instances</span>
@@ -403,9 +407,34 @@
     <dd>faults are parameterized over the package, so adding a library reuses the whole taxonomy for one small verifier and one entry</dd>
   </dl>
 
-  <h2><span class="n">6</span>Design basis</h2>
+  <h2><span class="n">6</span>What these numbers do not yet show</h2>
+
+  <p>The headline results are real measurements, and they are preliminary. This section states the limits plainly.</p>
+
+  <dl class="spec">
+    <dt>Sample size</dt>
+    <dd>most frontier arms hold five episodes. An exact 95% interval on a 5 of 5 result spans roughly <b>48% to 100%</b>, and a 0 of 5 arm does not establish a near-zero failure rate</dd>
+
+    <dt>Generality</dt>
+    <dd>the 2x2 uses one model, one recorded incident, and one deterministic fault, scored in one day. It establishes sensitivity to those cues in that fixture, not a general law of long-context agents</dd>
+
+    <dt>Contaminated history</dt>
+    <dd>not isolated as a cause. The explicitly contaminated arm passed 5 of 5, so the supported reading concerns the routing of unstated or buried safety information, not an inability to distrust its own history</dd>
+
+    <dt>Training</dt>
+    <dd>one training run and one rollout per fault, so the RL gain is not isolated from training-seed variance, and the held-out result ships without counts, intervals, or a task-level breakdown. Point estimates in few-run RL are a known evaluation trap (<a href="https://arxiv.org/abs/2108.13264">Agarwal et al., 2021</a>)</dd>
+
+    <dt>Reproduction</dt>
+    <dd>not currently possible from the outside. The public repository holds this page only, and the environment, transcripts, raw outcomes, and training pipeline remain in a private repository</dd>
+  </dl>
+
+  <h2><span class="n">7</span>Design basis</h2>
 
   <p>The environment follows three published designs. <a href="https://arxiv.org/abs/2511.07317">RLVE</a> matches task difficulty to the model being trained, the reason distance is a parameter. <a href="https://arxiv.org/abs/2607.14171">BPO</a> forks rollouts from sandbox snapshots, the reason an episode can fork at any package instead of rebuilding from scratch. <a href="https://arxiv.org/abs/2607.13988">TRACE</a> assigns credit to individual steps of a long task, adapted to state-based grading and waiting for training to begin.</p>
+
+  <footer>
+    <p>The environment and its full results remain in a private repository. This page is the standing summary of what exists, what has been measured, and what has not.</p>
+  </footer>
 
 </div>
 </body>
