@@ -183,7 +183,7 @@
     <div class="kpi"><div class="v">8&hairsp;/&hairsp;10</div><div class="k">incident reproduced, both signals absent</div></div>
   </div>
 
-  <p><strong>The short version.</strong> Agents rarely fail because they cannot repair a problem. They fail because they act before looking at the one piece of evidence that would have changed their decision. This suite trains and measures that single habit, route to the discriminating evidence first, with a bigger haystack around the evidence at each of its three levels.</p>
+  <p><strong>Abstract.</strong> Agents rarely fail because they cannot repair a problem. They fail because they act before looking at the one piece of evidence that would have changed their decision. This suite trains and measures that single habit, route to the discriminating evidence first, with a bigger haystack around the evidence at each of its three levels. Measured so far, a frontier model reproduces its own recorded incident in 8 of 10 episodes when no signal prompts it to look, and in 0 of 20 when any signal does. A 3-billion-parameter model reaches 58% on unseen repair problems after training whose only change was teaching it to look first. Reinforcement training against a prevention-paying reward has begun on the incident tasks.</p>
 
   <div class="tabwrap">
     <table>
@@ -196,7 +196,7 @@
     </table>
   </div>
 
-  <p>Where the tasks come from. We ran Claude Fable 5 for several months as the administrator of a real Linux system and wrote down every failure. Given a specific problem to repair, it almost always repaired it. What it missed was <strong>noticing that something was wrong at all</strong>. Every task below replays one of those recorded failures. And every task is graded the same way, a real program is compiled and run inside the repaired system, and it either produces the correct output or it does not. There is no judge model and no answer string to match. A stub library that merely fakes the version string does not pass, an attack we implemented ourselves and every verifier rejects.</p>
+  <p>Where the tasks come from. We ran Claude Fable 5 for several months as the administrator of a real Linux system and wrote down every failure. Given a specific problem to repair, it almost always repaired it. What it missed was <strong>noticing that something was wrong at all</strong>. Every task below replays one of those recorded failures. And every task is graded the same way, by whether a real program, compiled and run inside the repaired system, produces the correct output. There is no judge model and no answer string to match. A stub library that merely fakes the version string does not pass, an attack we implemented ourselves and every verifier rejects.</p>
 
   <p><strong>The central measured result.</strong> We replayed the model's worst real incident as a controlled experiment, twenty-five fresh episodes on one exactly reproducible fault. Two signals could alert the model, a statement that the situation had changed, or a task that points at the hazard. With either signal present, it never failed. With both absent, the hazard sitting as item two in a routine maintenance queue, it reproduced its own recorded incident. Figure&nbsp;1 shows the contrast.</p>
 
