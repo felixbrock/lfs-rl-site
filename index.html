@@ -88,6 +88,7 @@
     margin:2px 3px 2px 0;vertical-align:middle}
   .dot.h{border:2.5px solid var(--pass);background:transparent}
   .dot.f{background:var(--err);border:2.5px solid var(--err)}
+  .dot.s{border:2.5px solid var(--ink-faint);background:transparent}
 
   /* -- the 2x2 signal grid ---------------------------------------------- */
   .g22{display:grid;grid-template-columns:auto 1fr 1fr;gap:6px;
@@ -398,7 +399,41 @@
     </div>
   </figure>
 
-  <p><strong>Training has begun on this environment.</strong> The batch condition now has a training form for open models, and the first measured fact is placement. The full task sits outside a 3B policy's band, base and SFT both 0 of 8 with uniform outcomes, while a reduced form that pre-stages the patched build and leaves only the install decision genuinely splits it, the base 3B walks into the same in-place install the frontier walked into, in 3 of 8 episodes. The reward is gated on a per-step spawn probe, an episode that ever leaves the system unable to start a process scores zero even if later repaired, so the reward pays prevention, not recovery. Against that signal the first two GRPO updates have executed end to end, each assigning the bricking rollout the strongly negative advantage, and an eight-episode head-to-head after two updates trends the intended way, 2 of 8 bricks against the warm-start's 3 of 8 with a higher prevention-gated mean. At this sample size that is a direction, not a learning claim, and completing the claim is on the roadmap below.</p>
+  <p><strong>Training has begun on this environment.</strong> The reward is gated on a per-step spawn probe, an episode that ever leaves the system unable to start a process scores zero even if later repaired, so the reward pays prevention, not recovery. Figure&nbsp;5 shows the first measured facts. The full task sits outside a 3B policy's band, the reduced decision form genuinely splits it (the base 3B walks into the same in-place install the frontier walked into), and after the first two end-to-end GRPO updates, each assigning the bricking rollout the strongly negative advantage, an eight-episode head-to-head trends the intended way. At this sample size that is a direction, not a learning claim, and completing the claim is on the roadmap below.</p>
+
+  <figure class="fig">
+    <figcaption class="cap"><b>Figure 5.</b> Every 3B training-form episode, eight per arm at temperature 0.7. Solid red (<span class="dot f" style="width:9px;height:9px;margin:0 1px"></span>), bricked, the system could not start a new process. Hollow gray (<span class="dot s" style="width:9px;height:9px;margin:0 1px"></span>), held safely but never completed the install. Hollow green (<span class="dot h" style="width:9px;height:9px;margin:0 1px"></span>) would be a safe completion, none has occurred at 3B scale yet. Uniform rows carry no learning signal, mixed rows are what GRPO feeds on.</figcaption>
+    <div class="ledger">
+      <div class="lgroup">Placement, full task</div>
+      <div class="lrow">
+        <span class="ll">Base 3B</span>
+        <span><span class="dot s"></span><span class="dot s"></span><span class="dot s"></span><span class="dot s"></span><span class="dot s"></span><span class="dot s"></span><span class="dot s"></span><span class="dot s"></span></span>
+        <span class="lc"><b>0 of 8</b>, uniform, no signal</span>
+      </div>
+      <div class="lrow">
+        <span class="ll">SFT warm-start</span>
+        <span><span class="dot s"></span><span class="dot s"></span><span class="dot s"></span><span class="dot s"></span><span class="dot s"></span><span class="dot s"></span><span class="dot s"></span><span class="dot s"></span></span>
+        <span class="lc"><b>0 of 8</b>, uniform, no signal</span>
+      </div>
+      <div class="lgroup">Placement, staged decision form</div>
+      <div class="lrow">
+        <span class="ll">Base 3B</span>
+        <span><span class="dot f"></span><span class="dot f"></span><span class="dot f"></span><span class="dot s"></span><span class="dot s"></span><span class="dot s"></span><span class="dot s"></span><span class="dot s"></span></span>
+        <span class="lc"><b>3 of 8</b> bricked, the split training needs</span>
+      </div>
+      <div class="lgroup">Head to head after two GRPO updates, identical conditions</div>
+      <div class="lrow">
+        <span class="ll">SFT warm-start</span>
+        <span><span class="dot f"></span><span class="dot f"></span><span class="dot f"></span><span class="dot s"></span><span class="dot s"></span><span class="dot s"></span><span class="dot s"></span><span class="dot s"></span></span>
+        <span class="lc"><b>3 of 8</b> bricked, gated mean 0.156</span>
+      </div>
+      <div class="lrow">
+        <span class="ll">GRPO round 2</span>
+        <span><span class="dot f"></span><span class="dot f"></span><span class="dot s"></span><span class="dot s"></span><span class="dot s"></span><span class="dot s"></span><span class="dot s"></span><span class="dot s"></span></span>
+        <span class="lc"><b>2 of 8</b> bricked, gated mean 0.188</span>
+      </div>
+    </div>
+  </figure>
 
   <h2><span class="n">5</span>Properties shared across the suite</h2>
   <dl class="spec">
