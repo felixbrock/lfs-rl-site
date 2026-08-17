@@ -444,7 +444,7 @@
     <dd>the same seed reproduces the same fault and the same verifier</dd>
 
     <dt>Cost</dt>
-    <dd>what is shared is the substrate, every episode runs in the same rootless sandbox and restarts from a cached snapshot. Cost then scales with horizon, level 1 about <b>1.6 seconds</b> and 200 MB per episode with a full training run near <b>$0.50</b> of GPU time, level 3 roughly one to two minutes per episode with a full training day at <b>$1.64</b>, and level 2 episodes are dominated by the commands the agent runs, untrained so far</dd>
+    <dd>what is shared is the substrate, every episode runs in the same rootless sandbox and restarts from a cached snapshot. Cost then scales with horizon. Level 1 measures about <b>1.6 seconds</b> and 200 MB per episode, and the training run behind Figure&nbsp;2 cost about <b>$2.60</b> of GPU time including its evaluations. Level 3 training rounds of eight episodes took about 30 minutes each, and its two training days cost <b>$1.64</b> and <b>$1.95</b>. Level 2 episodes are dominated by the commands the agent runs, untrained so far</dd>
 
     <dt>Isolation</dt>
     <dd>allow-list filesystem and private loopback-only network, verified by writing markers toward every host path from inside and confirming none arrived</dd>
