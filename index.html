@@ -455,7 +455,7 @@
 
   <h2><span class="n">6</span>Design basis</h2>
 
-  <p>Three published designs shaped the suite. <a href="https://arxiv.org/abs/2511.07317">RLVE</a> showed that a learner needs tasks it sometimes solves and sometimes fails, which is why our difficulty is a dial. <a href="https://arxiv.org/abs/2607.14171">BPO</a> showed the value of restarting an episode from a snapshot instead of from scratch, which is why our build system can fork at any package. <a href="https://arxiv.org/abs/2607.13988">TRACE</a> scores the individual steps of a long task rather than only its end, adapted here to our on-disk grading and waiting for long-horizon training to begin.</p>
+  <p>One published design is applied in the current setup. <a href="https://arxiv.org/abs/2511.07317">RLVE</a> showed that a learner needs tasks it sometimes solves and sometimes fails, and that principle produced this week's training result, the full incident task measured all-fail, so a reduced form was built and measured until outcomes split. One substrate fact supports future work, every episode already restarts from a cached snapshot instead of a rebuild, and the build stack can fork at any package (verified). The two designs that would exploit this, <a href="https://arxiv.org/abs/2607.14171">BPO</a>-style forked rollouts and <a href="https://arxiv.org/abs/2607.13988">TRACE</a>-style per-step credit, are not yet implemented and appear as roadmap items below.</p>
 
   <h2><span class="n">7</span>Next measurements</h2>
 
@@ -482,6 +482,12 @@
 
     <dt>Exam integrity</dt>
     <dd>training and exam material stay disjoint by incident, so mining new incidents from continuing operation is a standing prerequisite, the readline incident now carries training forms and only incidents free of them count as the exam</dd>
+
+    <dt>Forked rollouts (BPO)</dt>
+    <dd>implement the training loop that forks an episode at a decision point and compares the siblings, the fork-native substrate is built and verified, the algorithm is not</dd>
+
+    <dt>Per-step credit (TRACE)</dt>
+    <dd>assign reward to individual commands from the per-step probe timeline instead of whole episodes, the adaptation is designed and the probe already records the needed signals</dd>
 
     <dt>Long-horizon dials</dt>
     <dd>score the distance-14 instance and the episode variants that never announce a fault, the dials Section&nbsp;3 leaves unmeasured</dd>
