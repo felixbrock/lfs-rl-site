@@ -334,7 +334,7 @@
 
   <div class="kick">Environment 3 of 3</div>
   <h2><span class="n">4</span>Ops-derived procedural tasks</h2>
-  <p class="status"><b>Status</b> &nbsp;Built and machine-verified. Thirty-one frontier episodes scored, no training yet.</p>
+  <p class="status"><b>Status</b> &nbsp;Built and machine-verified. Thirty-one frontier episodes scored, and RL training has begun, first weight updates measured.</p>
 
   <p>The incident reproduces only when nothing announces the change and the hazard sits in a routine queue, and every failure is an information-routing failure. No failing agent read the promotion markers or the warning page before acting, while the two agents that held routed the advisory's pointer to the warning page first, before touching anything. Figure&nbsp;4 lists every scored episode.</p>
 
@@ -383,6 +383,8 @@
     </div>
   </figure>
 
+  <p><strong>Training has begun on this environment.</strong> The batch condition now has a training form for open models, and the first measured fact is placement. The full task sits outside a 3B policy's band, base and SFT both 0 of 8 with uniform outcomes, while a reduced form that pre-stages the patched build and leaves only the install decision genuinely splits it, the base 3B walks into the same in-place install the frontier walked into, in 3 of 8 episodes. The reward is gated on a per-step spawn probe, an episode that ever leaves the system unable to start a process scores zero even if later repaired, so the reward pays prevention, not recovery. Against that signal the first two GRPO updates have executed end to end, each assigning the bricking rollout the strongly negative advantage, and an eight-episode head-to-head after two updates trends the intended way, 2 of 8 bricks against the warm-start's 3 of 8 with a higher prevention-gated mean. At this sample size that is a direction, not a learning claim, and completing the claim is on the roadmap below.</p>
+
   <h2><span class="n">5</span>Properties shared across the suite</h2>
   <dl class="spec">
     <dt>Format</dt>
@@ -421,6 +423,9 @@
 
     <dt>Training rigor</dt>
     <dd>repeat the Qwen run over multiple training seeds with multi-rollout evaluation, reporting held-out counts and interval estimates in the style of <a href="https://arxiv.org/abs/2108.13264">Agarwal et al., 2021</a>, so the RL gain is separated from seed variance</dd>
+
+    <dt>Prevention training</dt>
+    <dd>continue the live-install GRPO program past its first two verified updates, more rounds and 20-plus-episode evals, until the brick-rate delta carries a confidence interval rather than a direction</dd>
 
     <dt>Long-horizon dials</dt>
     <dd>score the distance-14 instance and the episode variants that never announce a fault, the dials Section&nbsp;3 leaves unmeasured</dd>
