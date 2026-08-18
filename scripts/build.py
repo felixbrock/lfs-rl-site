@@ -51,7 +51,8 @@ def render_line(line):
     m = re.match(r"^## (\d+) (.+?) \{#([a-z0-9-]+)\}$", line)
     if m:
         return (f'  <h2 id="{m.group(3)}"><span class="n">{m.group(1)}'
-                f"</span>{m.group(2)}</h2>")
+                f'</span>{m.group(2)}<a class="anchor" href="#{m.group(3)}"'
+                f' aria-label="Link to this section">§</a></h2>')
     if line.startswith("@kick "):
         return f'  <div class="kick">{line[6:]}</div>'
     if line.startswith("@status "):

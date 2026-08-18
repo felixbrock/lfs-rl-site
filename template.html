@@ -59,6 +59,12 @@
   h2{position:relative;font-size:1.16rem;font-weight:700;margin:2.7rem 0 .7rem;
     letter-spacing:-.005em}
   h2 .n{color:var(--accent);font-variant-numeric:tabular-nums;font-weight:600}
+  /* section permalink, visible on hover or keyboard focus */
+  h2 .anchor{font-weight:400;font-size:.85em;margin-left:.45rem;
+    border-bottom:none;color:var(--ink-faint);opacity:0}
+  h2:hover .anchor,h2 .anchor:focus{opacity:1}
+  h2 .anchor:hover{color:var(--accent)}
+  @media (hover:none){ h2 .anchor{opacity:.45} }
   @media (min-width:56rem){
     h2 .n{position:absolute;right:100%;margin-right:1.15rem}
   }

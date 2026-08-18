@@ -59,6 +59,12 @@
   h2{position:relative;font-size:1.16rem;font-weight:700;margin:2.7rem 0 .7rem;
     letter-spacing:-.005em}
   h2 .n{color:var(--accent);font-variant-numeric:tabular-nums;font-weight:600}
+  /* section permalink, visible on hover or keyboard focus */
+  h2 .anchor{font-weight:400;font-size:.85em;margin-left:.45rem;
+    border-bottom:none;color:var(--ink-faint);opacity:0}
+  h2:hover .anchor,h2 .anchor:focus{opacity:1}
+  h2 .anchor:hover{color:var(--accent)}
+  @media (hover:none){ h2 .anchor{opacity:.45} }
   @media (min-width:56rem){
     h2 .n{position:absolute;right:100%;margin-right:1.15rem}
   }
@@ -243,7 +249,7 @@
     </div>
   </div>
 
-  <h2 id="one-skill-three-horizons"><span class="n">1</span>One skill, three horizons</h2>
+  <h2 id="one-skill-three-horizons"><span class="n">1</span>One skill, three horizons<a class="anchor" href="#one-skill-three-horizons" aria-label="Link to this section">§</a></h2>
 
   <p>The three environments are the three rows of the opening table, and the routing skill was found in the data, not chosen in advance. Small horizon, a trained model only generalized after its training examples were rewritten to look at the deciding evidence first (check-first behavior 4 of 24 to 22 of 24). Medium horizon, the frontier model solved our hardest verified task by finding one inconsistent file among eighty packages. Large horizon, Figure&nbsp;1, the frontier fails exactly when nothing prompts it to look. Training climbs small to large, and incidents that never become training material are kept aside as the final exam.</p>
 
@@ -261,7 +267,7 @@
   </div>
 
   <div class="kick">Environment 1 of 3</div>
-  <h2 id="short-horizon-repair"><span class="n">2</span>Short-horizon repair</h2>
+  <h2 id="short-horizon-repair"><span class="n">2</span>Short-horizon repair<a class="anchor" href="#short-horizon-repair" aria-label="Link to this section">§</a></h2>
   <p class="status"><b>Status</b> &nbsp;Trained and evaluated. The only environment with training results.</p>
 
   <p>Training is already effective at this level. The agent is told which package is broken and must repair it, 74 machine-verified instances across five libraries, including a group where the error message blames the wrong component by design. A small model (Qwen2.5-3B) starts at 0% and after training solves <strong>58% of problems it never saw</strong> (Figure&nbsp;2). Additional example repairs alone produced no generalization, the model reproduced what it was shown. The improvement appeared only after every teaching example was rewritten to read the deciding evidence first, same tasks, same model, different examples. Frontier models already solve these tasks in 7 to 18 commands, so this level trains and evaluates open models rather than challenging the frontier.</p>
@@ -320,7 +326,7 @@
   </details>
 
   <div class="kick">Environment 2 of 3</div>
-  <h2 id="long-horizon-localization"><span class="n">3</span>Long-horizon localization</h2>
+  <h2 id="long-horizon-localization"><span class="n">3</span>Long-horizon localization<a class="anchor" href="#long-horizon-localization" aria-label="Link to this section">§</a></h2>
   <p class="status"><b>Status</b> &nbsp;Built and machine-verified. One frontier calibration episode, no training yet.</p>
 
   <p>We inject a fault into one package and allow the build to continue, so the visible failure surfaces later, up to fourteen packages downstream in the verified tasks. The agent is told nothing about where to look. Before a task counts, a machine check proves the injected fault causes the failure, patching where the failure surfaces does not repair it, and repairing the true cause does. Two candidates failed one proof and were removed, the checker filters rather than approves. Difficulty is an adjustable parameter, the same fault type passes at distance 5 and at distance 14, with 82 packages downstream available for expansion.</p>
@@ -349,7 +355,7 @@
   <p>Claude Fable 5 has attempted one instance, the easiest, and solved it in 24 of the 40 permitted commands through genuine diagnosis, rebuilding the suspect library from clean source and comparing it byte by byte against the installed copy. Every episode here still opens by announcing that something is broken, which is what the model was always good at. The unannounced variants are the same unmeasured settings as in Figure&nbsp;1 and remain on the roadmap.</p>
 
   <div class="kick">Environment 3 of 3</div>
-  <h2 id="ops-derived-procedural-tasks"><span class="n">4</span>Ops-derived procedural tasks</h2>
+  <h2 id="ops-derived-procedural-tasks"><span class="n">4</span>Ops-derived procedural tasks<a class="anchor" href="#ops-derived-procedural-tasks" aria-label="Link to this section">§</a></h2>
   <p class="status"><b>Status</b> &nbsp;Built and machine-verified. Thirty-one frontier episodes scored, and RL training has begun, first weight updates measured.</p>
 
   <p>This level is built from the real incident, nothing in it is artificially broken, the hazard is an old procedure meeting a changed world. In the <strong>live-install</strong> family, the agent holds an upgrade script written for a system under construction and must apply a security update to a system that is now live. Executed as written, the script replaces a library the running shell itself depends on, and partway through the replacement the system loses the ability to start a new process. The safe procedure, read the update's manual page, stage the new files beside the live ones, replace each with one atomic rename, in the correct order. In the <strong>false-failure</strong> family the trap is inverted, an upgrade succeeds and then reports failure because its verification step has a timing bug, and the agent must prove the system healthy instead of "fixing" it.</p>
@@ -436,7 +442,7 @@
   </figure>
 
   <div class="kick">Cross-model</div>
-  <h2 id="other-flagships"><span class="n">5</span>Other flagships on the same incident</h2>
+  <h2 id="other-flagships"><span class="n">5</span>Other flagships on the same incident<a class="anchor" href="#other-flagships" aria-label="Link to this section">§</a></h2>
   <p class="status"><b>Status</b> &nbsp;Measured. Twenty-one episodes across two hosted flagships, August 2026.</p>
 
   <p>The missing-signal failure is not specific to one vendor. <strong>Hermes 4 405B</strong> (Nous Research) and <strong>gpt-5.6-sol</strong> (OpenAI, the current Codex model) ran the live-install episode through a hosted API on the two corner arms of Figure&nbsp;1, strongest signal and no signal, keeping the two-phase design, routine work first, then the hazard arrives with that success in context. With the signal, 10 of 10 held across both models. Without it, Hermes reproduced the incident in 4 of 6 and sol in 5 of 5. The Figure&nbsp;1 contrast holds for all three models measured.</p>
@@ -477,7 +483,7 @@
 
   <p>Two caveats scope these numbers. The Figure&nbsp;1 episodes ran inside Claude's own agent product, the new models ran through a minimal text protocol, so rates compare within a model, not across models. Each arm holds 5 or 6 episodes. Pooled across both models the no-signal episodes (9 of 11 reproduced) span 48 to 98% at exact 95% confidence, the signal episodes (0 of 10) span 0 to 31%, and Hermes alone (22 to 96%) is too wide to support a claim on its own. The 21 episodes cost $4.45, the blocked Anthropic attempt roughly $11.</p>
 
-  <h2 id="properties"><span class="n">6</span>Properties shared across the suite</h2>
+  <h2 id="properties"><span class="n">6</span>Properties shared across the suite<a class="anchor" href="#properties" aria-label="Link to this section">§</a></h2>
   <dl class="spec">
     <dt>Format</dt>
     <dd>the short-horizon level plugs into standard RL tooling (packaged as a <code>verifiers</code> environment) and has been run end to end against a live model</dd>
@@ -495,11 +501,11 @@
     <dd>every fault type is written once and applied per package, so adding a new library means one small checking script and one list entry, the existing catalog applies unchanged</dd>
   </dl>
 
-  <h2 id="design-basis"><span class="n">7</span>Design basis</h2>
+  <h2 id="design-basis"><span class="n">7</span>Design basis<a class="anchor" href="#design-basis" aria-label="Link to this section">§</a></h2>
 
   <p>One published design is applied in the current system. <a href="https://arxiv.org/abs/2511.07317">RLVE</a> showed a learner needs tasks it sometimes solves and sometimes fails, and that principle produced the Figure&nbsp;5 result, the full incident task measured all-fail, so a reduced form was built until outcomes split. The substrate already restarts every episode from a cached snapshot and can fork the build at any package (verified). The two designs that would exploit this, <a href="https://arxiv.org/abs/2607.14171">BPO</a>-style forked rollouts and <a href="https://arxiv.org/abs/2607.13988">TRACE</a>-style per-step credit, are unimplemented roadmap items.</p>
 
-  <h2 id="next-measurements"><span class="n">8</span>Next measurements</h2>
+  <h2 id="next-measurements"><span class="n">8</span>Next measurements<a class="anchor" href="#next-measurements" aria-label="Link to this section">§</a></h2>
 
   <p>The roadmap follows directly from what the current numbers can and cannot yet say.</p>
 
