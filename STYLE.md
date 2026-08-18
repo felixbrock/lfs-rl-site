@@ -26,6 +26,20 @@ top to bottom before editing, verify bottom section after editing.
   incident is "reproduced", never a rotating set of synonyms.
 - The haystack metaphor is the one approved metaphor. Add no others.
 
+## Concision
+
+- Shortest version that survives the claims discipline. Draft, cut,
+  re-read, and if nothing is lost, keep the cut.
+- One theme per paragraph, five sentences maximum.
+- Never restate what a figure, a caption, or an earlier sentence
+  already says.
+- No meta-commentary. "the reason is itself a finding", "note what
+  this does and does not say" forbidden. State the finding.
+- Detail that does not change the section's conclusion moves to the
+  private results docs, not onto the page.
+- Cut connective framing ("and the difference is large", "worth
+  reporting because") unless it carries a claim.
+
 ## Communication order
 
 - Conclusion first, everywhere. Abstract before content, takeaway
