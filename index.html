@@ -183,7 +183,7 @@
     <div class="kpi"><div class="v">3&hairsp;/&hairsp;3</div><div class="k">flagships reproduce the incident, no signal present</div></div>
   </div>
 
-  <p id="abstract"><strong>Abstract.</strong> Agents rarely fail because they cannot repair a problem. They fail because they act before looking at the one piece of evidence that would have changed their decision. This suite trains and measures that single habit, route to the deciding evidence first, with a bigger haystack at each of its three levels. Measured so far, three flagship models (Claude Fable 5, gpt-5.6-sol, Hermes 4 405B) reproduce a real recorded incident in most or all episodes when no signal prompts them to look, and in 0 of 30 episodes when a signal does. A 3-billion-parameter model reaches 58% on unseen repair problems after training whose only change was teaching it to look first, and reinforcement training against a prevention-paying reward has begun on the incident tasks.</p>
+  <p id="abstract"><strong>Abstract.</strong> Agents increasingly operate real systems without supervision, and the incidents they cause there are rarely capability failures. Every flagship we measured can perform the repair, what fails is the step before, checking the current state of the world instead of acting on a remembered one. This suite makes that step, route to the deciding evidence first, measurable and trainable, with a bigger haystack around the evidence at each of its three levels. Three flagships (Claude Fable 5, gpt-5.6-sol, Hermes 4 405B) reproduce a real recorded incident in most or all episodes when no signal prompts them to look and in 0 of 30 episodes when one does, and unsupervised operation is exactly the setting where nobody provides the signal. A 3-billion-parameter model reaches 58% on unseen repair problems after training whose only change was teaching it to look first, and prevention training on the incident tasks has begun.</p>
 
   <div class="tabwrap">
     <table>
@@ -229,7 +229,7 @@
     </div>
   </figure>
 
-  <p>So the gap is not knowledge or skill. The safety information sat on disk in every episode, and whenever anything made the model look, it used the information correctly, even against its own minutes-old "this worked before" success (5 of 5). It failed only when nothing prompted the look. That look-before-acting habit is the routing skill from the opening table, and the suite exists to measure and train it.</p>
+  <p>So the gap is not knowledge or skill. The safety information sat on disk in every episode, and whenever anything made the model look, it used the information correctly, even against its own minutes-old "this worked before" success (5 of 5). It failed only when nothing prompted the look. That look-before-acting habit is the routing skill from the opening table, and the suite exists to measure and train it, because the more autonomous the deployment, the less often anything else provides the prompt.</p>
 
   <p class="cap"><b>Listing 1.</b> An example episode, a cross-package fault (symptom in one package, cause in another).</p>
   <div class="term">
