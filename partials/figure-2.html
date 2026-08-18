@@ -1,0 +1,52 @@
+  <figure class="fig" id="figure-2">
+    <figcaption class="cap"><b>Figure 2.</b> Share of problems fully solved at each training stage, one attempt per problem, "solved" means the repaired system runs, not merely builds. Gray bars, the 18 trained problems, red bars, problems the model never saw. Between base and final, 9 of the 18 trained problems flipped to solved and none flipped back, one-sided at a chance rate of 4 in 1000 (exact McNemar, p&nbsp;=&nbsp;0.004). The middle-to-final step alone is a trend.</figcaption>
+    <div class="leg">
+      <span><span class="sw" style="background:var(--ink-faint)"></span>Trained faults (18)</span>
+      <span><span class="sw" style="background:var(--accent)"></span>Held-out instances</span>
+    </div>
+    <svg viewBox="0 0 640 292" role="img" aria-label="Column chart. Trained faults, 0 percent base, 28 percent after supervised warm-start, 50 percent after GRPO. Held-out instances, 0, 33, and 58 percent.">
+      <line x1="40" y1="32"  x2="632" y2="32"  stroke="var(--rule)" stroke-width="1"/>
+      <line x1="40" y1="106" x2="632" y2="106" stroke="var(--rule)" stroke-width="1"/>
+      <line x1="40" y1="180" x2="632" y2="180" stroke="var(--rule)" stroke-width="1"/>
+      <line x1="40" y1="254" x2="632" y2="254" stroke="var(--rule-strong)" stroke-width="1"/>
+      <text class="ax" x="32" y="36"  text-anchor="end">60%</text>
+      <text class="ax" x="32" y="110" text-anchor="end">40</text>
+      <text class="ax" x="32" y="184" text-anchor="end">20</text>
+      <text class="ax" x="32" y="258" text-anchor="end">0</text>
+
+      <text class="val" x="124.7" y="247" text-anchor="middle">0%</text>
+      <text class="val" x="152.7" y="247" text-anchor="middle">0%</text>
+
+      <path d="M311,254 V154.4 Q311,150.4 315,150.4 H329 Q333,150.4 333,154.4 V254 Z" fill="var(--ink-faint)">
+        <title>Supervised warm-start, trained faults, 5 of 18 (28%)</title></path>
+      <path d="M339,254 V135.9 Q339,131.9 343,131.9 H357 Q361,131.9 361,135.9 V254 Z" fill="var(--accent)">
+        <title>Supervised warm-start, held-out instances, 33%</title></path>
+      <text class="val" x="322" y="143.4" text-anchor="middle">28%</text>
+      <text class="val" x="350" y="124.9" text-anchor="middle">33%</text>
+
+      <path d="M508.3,254 V73 Q508.3,69 512.3,69 H526.3 Q530.3,69 530.3,73 V254 Z" fill="var(--ink-faint)">
+        <title>GRPO, trained faults, 9 of 18 (50%)</title></path>
+      <path d="M536.3,254 V43.4 Q536.3,39.4 540.3,39.4 H554.3 Q558.3,39.4 558.3,43.4 V254 Z" fill="var(--accent)">
+        <title>GRPO, held-out instances, 58%</title></path>
+      <text class="val" x="519.3" y="62"   text-anchor="middle">50%</text>
+      <text class="val" x="547.3" y="32.4" text-anchor="middle">58%</text>
+
+      <text class="ax" x="138.7" y="278" text-anchor="middle">Base model</text>
+      <text class="ax" x="336"   y="278" text-anchor="middle">+ SFT warm-start</text>
+      <text class="ax" x="533.3" y="278" text-anchor="middle">+ GRPO (RL)</text>
+    </svg>
+  </figure>
+
+  <details>
+    <summary>Table view of Figure 2</summary>
+    <div class="tabwrap">
+      <table>
+        <thead><tr><th>Training stage</th><th class="num">Trained faults</th><th class="num">Held-out</th></tr></thead>
+        <tbody>
+          <tr><td>Base model, no training</td><td class="num">0 / 18 (0%)</td><td class="num">0%</td></tr>
+          <tr><td>+ supervised warm-start (SFT)</td><td class="num">5 / 18 (28%)</td><td class="num">33%</td></tr>
+          <tr class="emph"><td>+ GRPO (RL)</td><td class="num"><span class="pass">9 / 18 (50%)</span></td><td class="num"><span class="pass">58%</span></td></tr>
+        </tbody>
+      </table>
+    </div>
+  </details>

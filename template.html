@@ -1,0 +1,183 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="color-scheme" content="light only">
+<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16'><text y='13' font-size='13'>%F0%9F%94%A7</text></svg>">
+<title>lfs-rl, verifiable debugging environments derived from Claude Fable 5 failures</title>
+<meta name="description" content="An agent diagnoses and repairs a fault injected into a fully-built Linux system. The reward is a functional check run inside the repaired system, not a string match.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=STIX+Two+Text:ital,wght@0,400;0,600;0,700;1,400&family=IBM+Plex+Sans:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --paper:#faf8f4; --panel:#fffdf9; --ink:#211f1c; --ink-soft:#54524c; --ink-faint:#8a877f;
+    --accent:#7d2f35; --rule:#e4ddd1; --rule-strong:#454239; --code-bg:#f1ece2; --pass:#2f6b45;
+    --err:#a03426;
+    --serif:"STIX Two Text","Iowan Old Style",Palatino,"Palatino Linotype",Georgia,serif;
+    --sans:"IBM Plex Sans","Segoe UI",system-ui,sans-serif;
+    --mono:ui-monospace,"SF Mono",Menlo,Consolas,monospace;
+  }
+  *{box-sizing:border-box}
+  :root{color-scheme:light}
+  body{margin:0;background:var(--paper);color:var(--ink);font-family:var(--serif);
+    font-size:17.5px;line-height:1.68;-webkit-font-smoothing:antialiased}
+  .wrap{max-width:41rem;margin:0 auto;padding:4rem 1.4rem 5rem}
+  a{color:var(--accent);text-decoration:none;
+    border-bottom:1px solid color-mix(in srgb,var(--accent) 40%,transparent)}
+  a:hover{border-bottom-color:var(--accent)}
+  p{margin:0 0 1.05rem}
+  strong{font-weight:600}
+  code{font-family:var(--mono);font-size:.85em;background:var(--code-bg);padding:1px 5px;border-radius:3px}
+
+  /* -- title block, journal style ------------------------------------- */
+  header{text-align:center;margin-bottom:1.6rem}
+  .eyebrow{font-family:var(--sans);font-size:.68rem;letter-spacing:.22em;
+    text-transform:uppercase;color:var(--ink-faint);margin-bottom:1.1rem}
+  h1{font-size:clamp(1.5rem,4vw,1.95rem);line-height:1.28;font-weight:600;
+    margin:0 0 .8rem;letter-spacing:-.008em}
+  h1 strong{font-weight:inherit;color:var(--accent)}
+  .meta{font-style:italic;font-size:.92rem;color:var(--ink-soft);margin:0}
+  /* classic double rule under the title block */
+  .rule2{margin-top:1.6rem;height:5px;
+    border-top:2px solid var(--rule-strong);border-bottom:1px solid var(--rule-strong)}
+
+  /* -- headline numbers ------------------------------------------------ */
+  .kpis{display:grid;grid-template-columns:repeat(4,1fr);gap:1rem;
+    font-family:var(--sans);margin:0 0 2.2rem;padding:.9rem 0 .8rem;
+    border-bottom:1px solid var(--rule)}
+  .kpi .v{font-weight:600;font-size:1.45rem;line-height:1.15}
+  .kpi .k{font-size:.66rem;letter-spacing:.05em;text-transform:uppercase;
+    color:var(--ink-faint);line-height:1.5;margin-top:.15rem}
+  @media (max-width:34rem){.kpis{grid-template-columns:1fr 1fr;gap:.9rem 1rem}}
+
+  /* -- sections -------------------------------------------------------- */
+  .kick{font-family:var(--sans);font-size:.66rem;letter-spacing:.16em;
+    text-transform:uppercase;color:var(--accent);font-weight:600;margin:2.7rem 0 .15rem}
+  .kick + h2{margin-top:.1rem}
+  h2{position:relative;font-size:1.16rem;font-weight:700;margin:2.7rem 0 .7rem;
+    letter-spacing:-.005em}
+  h2 .n{color:var(--accent);font-variant-numeric:tabular-nums;font-weight:600}
+  @media (min-width:56rem){
+    h2 .n{position:absolute;right:100%;margin-right:1.15rem}
+  }
+  @media (max-width:55.99rem){ h2 .n{margin-right:.55rem} }
+  .status{font-family:var(--sans);font-size:.8rem;color:var(--ink-soft);
+    margin:0 0 .85rem}
+  .status b{font-weight:600;letter-spacing:.05em;text-transform:uppercase;
+    font-size:.72rem;color:var(--ink-faint)}
+
+  /* -- captions (figures, tables, listing) ------------------------------ */
+  .cap{font-family:var(--sans);font-size:.76rem;line-height:1.55;color:var(--ink-soft);
+    margin:1.5rem 0 .5rem;text-align:left}
+  .cap b{color:var(--ink);font-weight:600}
+
+  /* -- figures ---------------------------------------------------------- */
+  figure.fig{margin:0 0 1.5rem}
+  figure.fig svg{display:block;width:100%;height:auto}
+  .ax{font-family:var(--sans);font-size:11.5px;fill:var(--ink-faint)}
+  .val{font-family:var(--sans);font-size:12px;font-weight:500;fill:var(--ink-soft)}
+  .leg{font-family:var(--sans);font-size:.74rem;color:var(--ink-soft);
+    display:flex;flex-wrap:wrap;gap:.35rem 1.1rem;align-items:center;margin:0 0 .55rem}
+  .sw{display:inline-block;width:10px;height:10px;border-radius:2px;
+    vertical-align:-1px;margin-right:.4rem}
+
+  /* -- episode dots (hollow = held, solid = incident reproduced) -------- */
+  .dot{display:inline-block;width:11px;height:11px;border-radius:50%;
+    margin:2px 3px 2px 0;vertical-align:middle}
+  .dot.h{border:2.5px solid var(--pass);background:transparent}
+  .dot.f{background:var(--err);border:2.5px solid var(--err)}
+  .dot.s{border:2.5px solid var(--ink-faint);background:transparent}
+
+  /* -- the 2x2 signal grid ---------------------------------------------- */
+  .g22{display:grid;grid-template-columns:auto 1fr 1fr;gap:6px;
+    font-family:var(--sans)}
+  .g22 .ch{font-size:.68rem;letter-spacing:.04em;text-transform:uppercase;
+    color:var(--ink-faint);font-weight:600;align-self:end;padding:0 .2rem .2rem;
+    line-height:1.4}
+  .g22 .rh{font-size:.68rem;letter-spacing:.04em;text-transform:uppercase;
+    color:var(--ink-faint);font-weight:600;align-self:center;max-width:6.5rem;
+    line-height:1.45;padding-right:.3rem}
+  .g22 .cell{background:var(--panel);border:1px solid var(--rule);border-radius:4px;
+    padding:.6rem .7rem .5rem}
+  .g22 .cell.bad{background:color-mix(in srgb,var(--err) 8%,var(--panel));
+    border-color:color-mix(in srgb,var(--err) 30%,var(--rule))}
+  .g22 .ct{display:block;font-size:.76rem;color:var(--ink-soft);margin-top:.25rem}
+  .g22 .ct b{color:var(--ink)}
+
+  /* -- episode ledger ---------------------------------------------------- */
+  .ledger{font-family:var(--sans);font-size:.8rem;
+    border-top:2px solid var(--rule-strong);border-bottom:2px solid var(--rule-strong)}
+  .lgroup{font-size:.66rem;letter-spacing:.09em;text-transform:uppercase;
+    color:var(--ink-faint);font-weight:600;padding:.55rem 0 .15rem}
+  .lrow{display:grid;grid-template-columns:minmax(11rem,15rem) 1fr auto;
+    gap:.1rem .9rem;align-items:center;padding:.32rem 0;border-bottom:1px solid var(--rule)}
+  .lrow:last-child{border-bottom:none}
+  .lrow .ll{color:var(--ink-soft);line-height:1.45}
+  .lrow .lc{color:var(--ink-soft);text-align:right;font-variant-numeric:tabular-nums;
+    white-space:nowrap}
+  .lrow .lc b{color:var(--ink)}
+  @media (max-width:36rem){
+    .lrow{grid-template-columns:1fr auto}
+    .lrow .ll{grid-column:1 / -1;padding-top:.1rem}
+  }
+
+  /* -- booktabs tables -------------------------------------------------- */
+  .tabwrap{overflow-x:auto;margin:0 0 1.4rem}
+  table{border-collapse:collapse;width:100%;font-size:.92rem}
+  thead th{font-family:var(--sans);font-size:.66rem;letter-spacing:.09em;
+    text-transform:uppercase;color:var(--ink-faint);font-weight:600;
+    border-top:2px solid var(--rule-strong);border-bottom:1px solid var(--rule-strong);
+    padding:.5rem .7rem;text-align:left}
+  td{padding:.5rem .7rem;border-bottom:1px solid var(--rule)}
+  tbody tr:last-child td{border-bottom:2px solid var(--rule-strong)}
+  .num{font-variant-numeric:tabular-nums;text-align:right}
+  tr.emph td{font-weight:600}
+  .pass{color:var(--pass)}
+  details{font-size:.9rem;margin:0 0 1.4rem}
+  details summary{font-family:var(--sans);font-size:.76rem;color:var(--ink-soft);
+    cursor:pointer}
+  details .tabwrap{margin-top:.6rem}
+
+  /* -- datasheet as a ruled table -------------------------------------- */
+  .spec{display:grid;grid-template-columns:minmax(8rem,11rem) 1fr;gap:0 1.2rem;
+    margin:0 0 1.4rem;font-size:.92rem;
+    border-top:2px solid var(--rule-strong);border-bottom:2px solid var(--rule-strong)}
+  .spec dt{font-family:var(--sans);font-size:.72rem;letter-spacing:.05em;
+    text-transform:uppercase;color:var(--ink-faint);font-weight:600;
+    padding:.55rem 0 .5rem;line-height:1.55}
+  .spec dd{margin:0;padding:.5rem 0 .5rem}
+  .spec dt,.spec dd{border-bottom:1px solid var(--rule)}
+  .spec dt:nth-last-of-type(1),.spec dd:last-of-type{border-bottom:none}
+  .spec b{font-weight:600}
+  @media (max-width:30rem){
+    .spec{grid-template-columns:1fr;gap:0}
+    .spec dt{border-bottom:none;padding-bottom:.05rem}
+  }
+
+  /* -- listing ---------------------------------------------------------- */
+  .term{background:var(--panel);border:1px solid var(--rule);border-radius:4px;
+    overflow:hidden;margin:0 0 1.4rem}
+  .term-b{font-family:var(--mono);font-size:.72rem;line-height:1.85;
+    padding:.85rem 1rem;overflow-x:auto;color:var(--ink-soft)}
+  .term-b .l{white-space:pre}
+  .term-b .p{color:var(--accent)} .term-b .e{color:var(--err)}
+  .term-b .g{color:var(--pass)} .term-b .c{color:var(--ink-faint)}
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <header>
+    <div class="eyebrow">lfs-rl</div>
+    <h1>Verifiable debugging tasks for training and evaluating agents, derived from failures <strong>Claude Fable 5</strong> made in real operation.</h1>
+    <p class="meta">Working document · August 2026</p>
+    <div class="rule2"></div>
+  </header>
+
+{{content}}
+
+</div>
+</body>
+</html>

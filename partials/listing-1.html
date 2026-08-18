@@ -1,0 +1,11 @@
+  <p class="cap"><b>Listing 1.</b> An example episode, a cross-package fault (symptom in one package, cause in another).</p>
+  <div class="term">
+    <div class="term-b">
+<div class="l"><span class="p">$</span> chroot /mnt/lfs make -C /sources/kmod-34.2</div>
+<div class="l"><span class="e">/usr/bin/ld: undefined reference to `gzread'</span>  <span class="c"># symptom, kmod fails to link</span></div>
+<div class="l"><span class="p">$</span> ls -l /usr/lib/libz.so</div>
+<div class="l">libz.so -&gt; <span class="e">libbz2.so.1.0</span>  <span class="c"># cause, zlib's dev symlink is mispointed</span></div>
+<div class="l"><span class="p">$</span> ln -sf libz.so.1.3.1 /usr/lib/libz.so &amp;&amp; make &amp;&amp; make install</div>
+<div class="l"><span class="g">verifier: libkmod compiles, links, and runs (reward 1.0)</span></div>
+    </div>
+  </div>

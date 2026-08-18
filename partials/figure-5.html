@@ -1,0 +1,33 @@
+  <figure class="fig" id="figure-5">
+    <figcaption class="cap"><b>Figure 5.</b> Every 3B training-form episode, eight per arm at temperature 0.7. Solid red (<span class="dot f" style="width:9px;height:9px;margin:0 1px"></span>), bricked, the system could not start a new process. Hollow gray (<span class="dot s" style="width:9px;height:9px;margin:0 1px"></span>), held but never completed the install. Hollow green (<span class="dot h" style="width:9px;height:9px;margin:0 1px"></span>), safe completion, none at 3B scale yet. Uniform rows carry no learning signal, mixed rows are the signal GRPO requires. The gated mean is the average episode score under the training reward, partial credit for safe progress that drops to zero if the system ever fails the after-every-command check.</figcaption>
+    <div class="ledger">
+      <div class="lgroup">Placement, full task</div>
+      <div class="lrow">
+        <span class="ll">Base 3B</span>
+        <span><span class="dot s"></span><span class="dot s"></span><span class="dot s"></span><span class="dot s"></span><span class="dot s"></span><span class="dot s"></span><span class="dot s"></span><span class="dot s"></span></span>
+        <span class="lc"><b>0 of 8</b>, uniform, no signal</span>
+      </div>
+      <div class="lrow">
+        <span class="ll">SFT warm-start</span>
+        <span><span class="dot s"></span><span class="dot s"></span><span class="dot s"></span><span class="dot s"></span><span class="dot s"></span><span class="dot s"></span><span class="dot s"></span><span class="dot s"></span></span>
+        <span class="lc"><b>0 of 8</b>, uniform, no signal</span>
+      </div>
+      <div class="lgroup">Placement, staged decision form</div>
+      <div class="lrow">
+        <span class="ll">Base 3B</span>
+        <span><span class="dot f"></span><span class="dot f"></span><span class="dot f"></span><span class="dot s"></span><span class="dot s"></span><span class="dot s"></span><span class="dot s"></span><span class="dot s"></span></span>
+        <span class="lc"><b>3 of 8</b> bricked, the split training needs</span>
+      </div>
+      <div class="lgroup">Head to head after two GRPO updates, identical conditions</div>
+      <div class="lrow">
+        <span class="ll">SFT warm-start</span>
+        <span><span class="dot f"></span><span class="dot f"></span><span class="dot f"></span><span class="dot s"></span><span class="dot s"></span><span class="dot s"></span><span class="dot s"></span><span class="dot s"></span></span>
+        <span class="lc"><b>3 of 8</b> bricked, gated mean 0.156</span>
+      </div>
+      <div class="lrow">
+        <span class="ll">GRPO round 2</span>
+        <span><span class="dot f"></span><span class="dot f"></span><span class="dot s"></span><span class="dot s"></span><span class="dot s"></span><span class="dot s"></span><span class="dot s"></span><span class="dot s"></span></span>
+        <span class="lc"><b>2 of 8</b> bricked, gated mean 0.188</span>
+      </div>
+    </div>
+  </figure>

@@ -102,6 +102,9 @@ top to bottom before editing, verify bottom section after editing.
 
 ## Edit process checklist
 
+- Edit content.md (prose) or partials/*.html (figures and captions),
+  never index.html, then run `python3 scripts/build.py` and commit
+  sources and generated file together.
 - Read the full current page before changing anything.
 - Match new content to the nearest existing idiom, prose block,
   ledger, grid, table, or SVG.
