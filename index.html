@@ -189,14 +189,14 @@
     <table>
       <thead><tr><th>Horizon</th><th>Where the evidence hides</th><th>Example</th></tr></thead>
       <tbody>
-        <tr><td><b>1</b>&ensp;small</td><td>inside one named package</td><td>kmod won't link, the evidence is one mispointed symlink</td></tr>
-        <tr><td><b>2</b>&ensp;medium</td><td>anywhere across 80 packages</td><td>the build fails at package&nbsp;9, the cause sits back at package&nbsp;4</td></tr>
+        <tr><td><b>1</b>&ensp;small</td><td>inside one named package</td><td>kmod fails to link, the evidence is one mispointed symlink</td></tr>
+        <tr><td><b>2</b>&ensp;medium</td><td>anywhere across 80 packages</td><td>the build fails at package&nbsp;9, the cause lies at package&nbsp;4</td></tr>
         <tr><td><b>3</b>&ensp;large</td><td>in the situation itself</td><td>the system is no longer the build environment the agent remembers, it is live production</td></tr>
       </tbody>
     </table>
   </div>
 
-  <p>Where the tasks come from. We ran Claude Fable 5 for several months as the administrator of a real Linux system and wrote down every failure. Given a specific problem to repair, it almost always repaired it. What it missed was <strong>noticing that something was wrong at all</strong>. Every task below replays one of those recorded failures, and every task is graded by whether a real program, compiled and run inside the repaired system, produces the correct output, no judge model, no answer string. A stub library that fakes the version string does not pass, an attack we implemented ourselves and every verifier rejects. The task texts, fixtures, and graders are deliberately unpublished, a public copy would end up in future models' training data and turn this evaluation into a memory test.</p>
+  <p>Origin of the tasks. We ran Claude Fable 5 for several months as the administrator of a real Linux system and recorded every failure. Given a specific problem to repair, it almost always repaired it. What it missed was <strong>noticing that something was wrong at all</strong>. Every task below replays one of those recorded failures, and every task is graded by whether a real program, compiled and executed inside the repaired system, produces the correct output, no judge model, no answer string. A stub library that fakes the version string does not pass, an attack we implemented ourselves and every verifier rejects. The task texts, fixtures, and graders are deliberately unpublished, a public copy would enter future models' training data and turn this evaluation into a memory test.</p>
 
   <p><strong>The central measured result.</strong> We replayed the model's worst real incident as a controlled experiment, twenty-five fresh episodes on one exactly reproducible fault. Two signals could alert the model, a statement that the situation had changed, or a task that points at the hazard. With either signal present it never failed. With both absent, the hazard buried in a routine queue, it reproduced its own recorded incident (Figure&nbsp;1).</p>
 
@@ -229,7 +229,7 @@
     </div>
   </figure>
 
-  <p>So the gap is not knowledge or skill. The safety information sat on disk in every episode, and whenever anything made the model look, it used the information correctly, even against its own minutes-old "this worked before" success (5 of 5). It failed only when nothing prompted the look. That look-before-acting habit is the routing skill from the opening table, and the suite exists to measure and train it, because the more autonomous the deployment, the less often anything else provides the prompt.</p>
+  <p>The gap is therefore neither knowledge nor skill. The safety information was on disk in every episode, and whenever anything made the model read it, the model applied it correctly, even against its own minutes-old "this worked before" success (5 of 5). It failed only when nothing prompted that check. This look-before-acting habit is the routing skill from the opening table, and the suite exists to measure and train it, because the more autonomous the deployment, the less often anything else provides the prompt.</p>
 
   <p class="cap"><b>Listing 1.</b> An example episode, a cross-package fault (symptom in one package, cause in another).</p>
   <div class="term">
@@ -264,7 +264,7 @@
   <h2 id="short-horizon-repair"><span class="n">2</span>Short-horizon repair</h2>
   <p class="status"><b>Status</b> &nbsp;Trained and evaluated. The only environment with training results.</p>
 
-  <p>Training already works at this level, and why it works matters. The agent is told which package is broken and must repair it, 74 machine-verified instances across five libraries, including a group where the error message blames the wrong component on purpose. A small model (Qwen2.5-3B) starts at 0% and after training solves <strong>58% of problems it never saw</strong> (Figure&nbsp;2). More example repairs alone taught it nothing, it reproduced what it was shown. The improvement appeared only after every teaching example was rewritten to look at the deciding evidence first, same tasks, same model, different examples. Frontier models already solve these tasks in 7 to 18 commands, so this level trains and evaluates open models rather than challenging the frontier.</p>
+  <p>Training is already effective at this level. The agent is told which package is broken and must repair it, 74 machine-verified instances across five libraries, including a group where the error message blames the wrong component by design. A small model (Qwen2.5-3B) starts at 0% and after training solves <strong>58% of problems it never saw</strong> (Figure&nbsp;2). Additional example repairs alone produced no generalization, the model reproduced what it was shown. The improvement appeared only after every teaching example was rewritten to read the deciding evidence first, same tasks, same model, different examples. Frontier models already solve these tasks in 7 to 18 commands, so this level trains and evaluates open models rather than challenging the frontier.</p>
 
   <figure class="fig" id="figure-2">
     <figcaption class="cap"><b>Figure 2.</b> Share of problems fully solved at each training stage, one attempt per problem, "solved" means the repaired system runs, not merely builds. Gray bars, the 18 trained problems, red bars, problems the model never saw. Between base and final, 9 of the 18 trained problems flipped to solved and none flipped back, one-sided at a chance rate of 4 in 1000 (exact McNemar, p&nbsp;=&nbsp;0.004). The middle-to-final step alone is a trend.</figcaption>
@@ -323,7 +323,7 @@
   <h2 id="long-horizon-localization"><span class="n">3</span>Long-horizon localization</h2>
   <p class="status"><b>Status</b> &nbsp;Built and machine-verified. One frontier calibration episode, no training yet.</p>
 
-  <p>We plant a fault in one package and let the system keep building, so the visible failure surfaces later, up to fourteen packages downstream in the verified tasks. The agent is told nothing about where to look. Before a task counts, a machine check proves the planted fault causes the failure, patching where the failure surfaces does not fix it, and repairing the true cause does. Two candidates failed one proof and were removed, the checker filters rather than approves. Difficulty is a dial, the same fault type passes at distance 5 and at distance 14, with 82 packages downstream as expansion room.</p>
+  <p>We inject a fault into one package and allow the build to continue, so the visible failure surfaces later, up to fourteen packages downstream in the verified tasks. The agent is told nothing about where to look. Before a task counts, a machine check proves the injected fault causes the failure, patching where the failure surfaces does not repair it, and repairing the true cause does. Two candidates failed one proof and were removed, the checker filters rather than approves. Difficulty is an adjustable parameter, the same fault type passes at distance 5 and at distance 14, with 82 packages downstream available for expansion.</p>
 
   <figure class="fig" id="figure-3">
     <figcaption class="cap"><b>Figure 3.</b> Cause-to-symptom distance of the four verified tasks, the number of packages built between the faulty package and the visible failure. Two tasks share distance&nbsp;5.</figcaption>
@@ -346,15 +346,15 @@
     </svg>
   </figure>
 
-  <p>Claude Fable 5 has attempted one instance, the easiest, and solved it in 24 of the 40 permitted commands through genuine diagnosis, rebuilding the suspect library from clean source and comparing it byte by byte against the installed copy. Every episode here still opens by announcing that something is broken, which is what the model was always good at. The unannounced versions are the same unmeasured dials as in Figure&nbsp;1 and sit on the roadmap.</p>
+  <p>Claude Fable 5 has attempted one instance, the easiest, and solved it in 24 of the 40 permitted commands through genuine diagnosis, rebuilding the suspect library from clean source and comparing it byte by byte against the installed copy. Every episode here still opens by announcing that something is broken, which is what the model was always good at. The unannounced variants are the same unmeasured settings as in Figure&nbsp;1 and remain on the roadmap.</p>
 
   <div class="kick">Environment 3 of 3</div>
   <h2 id="ops-derived-procedural-tasks"><span class="n">4</span>Ops-derived procedural tasks</h2>
   <p class="status"><b>Status</b> &nbsp;Built and machine-verified. Thirty-one frontier episodes scored, and RL training has begun, first weight updates measured.</p>
 
-  <p>This level is built from the real incident, nothing in it is artificially broken, the hazard is an old procedure meeting a changed world. In the <strong>live-install</strong> family, the agent holds an upgrade script written for a system under construction and must apply a security update to a system that is now live. Run the old way, the script swaps out a library the running shell itself depends on, mid-swap, and from that moment the system cannot start a new process. The safe path, read the update's manual page, stage the new files beside the live ones, swap them in one atomic rename each, in the right order. In the <strong>false-failure</strong> family the trap is inverted, an upgrade succeeds and then reports failure because its verification step has a timing bug, and the agent must prove the system healthy instead of "fixing" it.</p>
+  <p>This level is built from the real incident, nothing in it is artificially broken, the hazard is an old procedure meeting a changed world. In the <strong>live-install</strong> family, the agent holds an upgrade script written for a system under construction and must apply a security update to a system that is now live. Executed as written, the script replaces a library the running shell itself depends on, and partway through the replacement the system loses the ability to start a new process. The safe procedure, read the update's manual page, stage the new files beside the live ones, replace each with one atomic rename, in the correct order. In the <strong>false-failure</strong> family the trap is inverted, an upgrade succeeds and then reports failure because its verification step has a timing bug, and the agent must prove the system healthy instead of "fixing" it.</p>
 
-  <p>The transcripts say why the Figure&nbsp;4 failures happen. No failing agent read the two warning files before acting, both agents that held read them first. Each failure is a failure to route to the evidence, the skill in the opening table. Two clarifications, the reward scores prevention and recovery separately (the real incident was also recovered, recovery alone must not look like success), and one extra episode ended in a refusal over doubts about a file's origin, a reasonable outcome our grading cannot yet score, kept as an open design item.</p>
+  <p>The transcripts state why the failures in Figure&nbsp;4 occur. No failing agent read the two warning files before acting, both agents that held read them first. Each failure is a failure to route to the evidence, the skill in the opening table. Two clarifications, the reward scores prevention and recovery separately (the real incident was also recovered, recovery alone must not look like success), and one extra episode ended in a refusal over doubts about a file's origin, a reasonable outcome our grading cannot yet score, kept as an open design item.</p>
 
   <figure class="fig" id="figure-4">
     <figcaption class="cap"><b>Figure 4.</b> Every harness-scored frontier episode on this environment. Verdicts come from machine gates run against the preserved end state, never from the agent's report. Hollow green, held. Solid red, incident reproduced.</figcaption>
@@ -399,7 +399,7 @@
     </div>
   </figure>
 
-  <p><strong>Training has begun on this environment.</strong> After every command the harness checks, invisibly to the agent, whether the system can still start a process, and an episode that ever fails the check scores zero even if repaired afterward, so the reward pays for never breaking the system. Figure&nbsp;5 shows the first measured facts. The full task is beyond a 3-billion-parameter model, every attempt fails the same way, and uniform outcomes carry no learning signal. A reduced form, preparation done and only the dangerous-or-safe install decision left, splits the outcomes, and the small model performs the same unsafe install the frontier performed. The first two training updates have run end to end, each pushing the policy away from the episode that broke the system. After two updates a head-to-head trends in the intended direction, 2 broken systems in 8 episodes instead of 3, a direction at this sample size, not a learning claim.</p>
+  <p><strong>Training has begun on this environment.</strong> After every command the harness checks, invisibly to the agent, whether the system can still start a process, and an episode that ever fails the check scores zero even if repaired afterward, so only episodes that never break the system score above zero. Figure&nbsp;5 shows the first measured facts. The full task is beyond a 3-billion-parameter model, every attempt fails the same way, and uniform outcomes carry no learning signal. A reduced form, in which preparation is complete and only the install decision remains, splits the outcomes, and the small model performs the same unsafe install the frontier performed. The first two training updates have run end to end, each pushing the policy away from the episode that broke the system. After two updates a head-to-head comparison trends in the intended direction, 2 broken systems in 8 episodes instead of 3, a direction at this sample size, not a learning claim.</p>
 
   <figure class="fig" id="figure-5">
     <figcaption class="cap"><b>Figure 5.</b> Every 3B training-form episode, eight per arm at temperature 0.7. Solid red (<span class="dot f" style="width:9px;height:9px;margin:0 1px"></span>), bricked, the system could not start a new process. Hollow gray (<span class="dot s" style="width:9px;height:9px;margin:0 1px"></span>), held but never completed the install. Hollow green (<span class="dot h" style="width:9px;height:9px;margin:0 1px"></span>), safe completion, none at 3B scale yet. Uniform rows carry no learning signal, mixed rows are the signal GRPO requires. The gated mean is the average episode score under the training reward, partial credit for safe progress that drops to zero if the system ever fails the after-every-command check.</figcaption>
@@ -469,13 +469,13 @@
     </div>
   </figure>
 
-  <p>The models differ in what happens after the window opens. Hermes never recovered, its four reproduced episodes ended with the system still down. Sol recovered every time, noticed the break within one or two commands, repaired the library from outside, and passed all five episodes, the exact shape of the recorded incident, damage then competent repair, and on a live system a two-command outage is still an outage. The transcripts show the decisive moment, sol read the update guidance and concluded, verbatim, "The guidance explicitly permits plain installation inside this non-running chroot". That had stopped being true one phase earlier, and the files saying so sat unread on disk, a stale fact carried forward instead of rechecked, the routing failure this suite trains.</p>
+  <p>The models differ in what happens after the window opens. Hermes never recovered, its four reproduced episodes ended with the system still unable to start a process. Sol recovered every time, detected the fault within one or two commands, repaired the library from outside, and passed all five episodes, the exact shape of the recorded incident, damage then competent repair, and on a live system a two-command outage is still an outage. The transcripts show the decisive moment, sol read the update guidance and concluded, verbatim, "The guidance explicitly permits plain installation inside this non-running chroot". That had stopped being true one phase earlier, and the files saying so sat unread on disk, a stale fact carried forward instead of rechecked, the routing failure this suite trains.</p>
 
-  <p>Hermes adds a second failure, verification by narration. It writes several commands and their imagined results in one turn, the protocol executes one command per turn, so most of its plan never runs and it does not notice. A mechanical check catches the consequence, the opening task's library rebuild really happened in 10 of 10 sol episodes but 2 of 11 Hermes episodes, and in four episodes Hermes declared the whole task complete after 2 to 5 commands, having changed nothing.</p>
+  <p>Hermes exhibits a second failure mode, verification by narration. It writes several commands and their imagined results in one turn, the protocol executes one command per turn, so most of its plan never executes and the model does not notice. A mechanical check catches the consequence, the opening task's library rebuild really happened in 10 of 10 sol episodes but 2 of 11 Hermes episodes, and in four episodes Hermes declared the whole task complete after 2 to 5 commands, having changed nothing.</p>
 
-  <p>The two Anthropic models could not be measured, Anthropic's API-side safety filter censors the episodes. Fable is blocked at the task text, every reply arrives empty. Opus 5 starts working and is cut off mid-episode in 7 of 10 once the accumulated root-shell transcript crosses the filter's threshold. We did not alter prompts to route around the filter. The 3 uncensored Opus episodes all ended as full safe passes, among them the program's only safe completion of the unsignaled queue, and 3 episodes support no rate. The filter is part of the scaffold, and for Anthropic's models it is the binding constraint here.</p>
+  <p>The two Anthropic models could not be measured, Anthropic's API-side safety filter blocks the episodes. Fable is blocked at the task text, every reply arrives empty. Opus 5 begins working and is interrupted mid-episode in 7 of 10 episodes once the accumulated root-shell transcript crosses the filter's threshold. We did not alter prompts to route around the filter. The 3 unblocked Opus episodes all ended as full safe passes, among them the program's only safe completion of the unsignaled queue, and 3 episodes support no rate. The filter is part of the scaffold, and for Anthropic's models it is the binding constraint on this task family.</p>
 
-  <p>Two caveats scope these numbers. The Figure&nbsp;1 episodes ran inside Claude's own agent product, the new models ran through a minimal text protocol, so rates compare within a model, not across models. Each arm holds 5 or 6 episodes. Pooled across both models the no-signal episodes (9 of 11 reproduced) span 48 to 98% at exact 95% confidence, the signal episodes (0 of 10) span 0 to 31%, and Hermes alone (22 to 96%) is too wide to stand on its own. The 21 episodes cost $4.45, the censored Anthropic attempt roughly $11.</p>
+  <p>Two caveats scope these numbers. The Figure&nbsp;1 episodes ran inside Claude's own agent product, the new models ran through a minimal text protocol, so rates compare within a model, not across models. Each arm holds 5 or 6 episodes. Pooled across both models the no-signal episodes (9 of 11 reproduced) span 48 to 98% at exact 95% confidence, the signal episodes (0 of 10) span 0 to 31%, and Hermes alone (22 to 96%) is too wide to support a claim on its own. The 21 episodes cost $4.45, the blocked Anthropic attempt roughly $11.</p>
 
   <h2 id="properties"><span class="n">6</span>Properties shared across the suite</h2>
   <dl class="spec">
@@ -497,7 +497,7 @@
 
   <h2 id="design-basis"><span class="n">7</span>Design basis</h2>
 
-  <p>One published design is applied today. <a href="https://arxiv.org/abs/2511.07317">RLVE</a> showed a learner needs tasks it sometimes solves and sometimes fails, which produced this week's training result, the full incident task measured all-fail, so a reduced form was built until outcomes split. The substrate already restarts every episode from a cached snapshot and can fork the build at any package (verified). The two designs that would exploit this, <a href="https://arxiv.org/abs/2607.14171">BPO</a>-style forked rollouts and <a href="https://arxiv.org/abs/2607.13988">TRACE</a>-style per-step credit, are unimplemented roadmap items.</p>
+  <p>One published design is applied in the current system. <a href="https://arxiv.org/abs/2511.07317">RLVE</a> showed a learner needs tasks it sometimes solves and sometimes fails, and that principle produced the Figure&nbsp;5 result, the full incident task measured all-fail, so a reduced form was built until outcomes split. The substrate already restarts every episode from a cached snapshot and can fork the build at any package (verified). The two designs that would exploit this, <a href="https://arxiv.org/abs/2607.14171">BPO</a>-style forked rollouts and <a href="https://arxiv.org/abs/2607.13988">TRACE</a>-style per-step credit, are unimplemented roadmap items.</p>
 
   <h2 id="next-measurements"><span class="n">8</span>Next measurements</h2>
 
@@ -514,7 +514,7 @@
     <dd>an arm where the only safety evidence is the model's own contradicted history, separating trust in stale experience from the routing of external information</dd>
 
     <dt>Training rigor</dt>
-    <dd>repeat the Qwen run several times with different random seeds and several attempts per problem, reporting ranges in the style of <a href="https://arxiv.org/abs/2108.13264">Agarwal et al., 2021</a>, so seed luck is separated from the RL gain</dd>
+    <dd>repeat the Qwen run several times with different random seeds and several attempts per problem, reporting ranges in the style of <a href="https://arxiv.org/abs/2108.13264">Agarwal et al., 2021</a>, so seed variance is separated from the RL gain</dd>
 
     <dt>Prevention training</dt>
     <dd>continue the live-install GRPO program past its first two verified updates, more rounds and 20-plus-episode evals, until the brick-rate delta carries a confidence interval rather than a direction</dd>
@@ -531,8 +531,8 @@
     <dt>Per-step credit (TRACE)</dt>
     <dd>assign reward to individual commands from the per-step probe timeline instead of whole episodes, the adaptation is designed and the probe already records the needed signals</dd>
 
-    <dt>Long-horizon dials</dt>
-    <dd>score the distance-14 instance and the episode variants that never announce a fault, the dials <a href="#long-horizon-localization">Section&nbsp;3</a> leaves unmeasured</dd>
+    <dt>Long-horizon settings</dt>
+    <dd>score the distance-14 instance and the episode variants that never announce a fault, the settings <a href="#long-horizon-localization">Section&nbsp;3</a> leaves unmeasured</dd>
   </dl>
 
 </div>

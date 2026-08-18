@@ -5,7 +5,16 @@ top to bottom before editing, verify bottom section after editing.
 
 ## Voice and register
 
-- StatQuest clarity, professional register. Plain words, never casual.
+- StatQuest clarity, paper register. Plain words, never casual, as in
+  a published paper.
+- No contractions ("won't" forbidden, "fails to" correct).
+- No colloquial verbs. "pays for", "swaps out", "the system is down"
+  forbidden, "scores", "replaces", "the system cannot start a process"
+  correct. Formal precise verbs, occur, detect, execute, replace.
+- Simplicity survives the register. One idea per sentence and tiny
+  concrete examples are not casual, keep them.
+- No time-relative phrasing ("this week", "recently"). Tie statements
+  to figures or absolute dates.
 - One idea per sentence. Short sentences beat compound ones.
 - Introduce every term plain-words first, name it after. "the model
   looks at the deciding evidence first, we call this routing" and
