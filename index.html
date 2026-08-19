@@ -74,6 +74,14 @@
   .status b{font-weight:600;letter-spacing:.05em;text-transform:uppercase;
     font-size:.72rem;color:var(--ink-faint)}
 
+  /* -- document-level notice -------------------------------------------- */
+  .notice{font-family:var(--sans);font-size:.78rem;line-height:1.55;
+    color:var(--ink-soft);background:var(--panel);border:1px solid var(--rule);
+    border-left:3px solid var(--accent);border-radius:3px;
+    padding:.7rem .95rem;margin:0 0 1.6rem}
+  .notice b{color:var(--accent);font-weight:600;letter-spacing:.05em;
+    text-transform:uppercase;font-size:.72rem}
+
   /* -- captions (figures, tables, listing) ------------------------------ */
   .cap{font-family:var(--sans);font-size:.76rem;line-height:1.55;color:var(--ink-soft);
     margin:1.5rem 0 .5rem;text-align:left}
@@ -181,6 +189,10 @@
     <p class="meta">Working document · August 2026</p>
     <div class="rule2"></div>
   </header>
+
+  <div class="notice" role="note">
+    <b>Preliminary</b> &nbsp;The results reported on this page are intermediate. Runs are ongoing and every number may change. This report was written by Claude Code, an AI coding agent.
+  </div>
 
   <div class="kpis">
     <div class="kpi"><div class="v">3</div><div class="k">environments in the suite</div></div>
