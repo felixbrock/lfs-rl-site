@@ -1,5 +1,3 @@
-{{notice}}
-
 @kpis
 3 :: environments in the suite
 74 :: verified short-horizon instances
