@@ -1,6 +1,6 @@
 @kpis
 3 :: environments in the suite
-74 :: verified short-horizon instances
+104 :: machine-verified short-horizon instances
 58% :: held-out full-solve after RL, from 0% base
 3&hairsp;/&hairsp;3 :: flagships reproduce the incident, no signal present
 
@@ -38,7 +38,9 @@ All three share one agent-facing contract, a shell and one command per turn, and
 ## 2 Short-horizon repair {#short-horizon-repair}
 @status Trained and evaluated. The only environment with training results.
 
-Training is already effective at this level. The agent is told which package is broken and must repair it, 74 machine-verified instances across five libraries, including a group where the error message blames the wrong component by design. A small model (Qwen2.5-3B) starts at 0% and after training solves **58% of problems it never saw** (Figure&nbsp;2). Additional example repairs alone produced no generalization, the model reproduced what it was shown. The improvement appeared only after every teaching example was rewritten to read the deciding evidence first, same tasks, same model, different examples. Frontier models already solve these tasks in 7 to 18 commands, so this level trains and evaluates open models rather than challenging the frontier.
+Training is already effective at this level. The agent is told which package is broken and must repair it, 119 instances across five libraries, 104 of them machine-verified on the current build and 15 awaiting a virtual machine, including a group where the error message blames the wrong component by design. A small model (Qwen2.5-3B) starts at 0% and after training solves **58% of problems it never saw** (Figure&nbsp;2). Frontier models already solve these tasks in 7 to 18 commands, so this level trains and evaluates open models rather than challenging the frontier.
+
+Additional example repairs alone produced no generalization, the model reproduced what it was shown. An earlier run trained on plain replayed repairs solved 9 of its 18 trained problems (0 of 18 at base, exact McNemar p&nbsp;=&nbsp;0.004) and 1 of 13 held-out problems, one attempt each. The improvement appeared only after every teaching example was rewritten to read the deciding evidence first, same tasks, same model, different examples, held-out solves 3 of 24 to 8 of 24 after supervised training alone and 14 of 24 after RL.
 
 {{figure-2}}
 
@@ -46,11 +48,11 @@ Training is already effective at this level. The agent is told which package is 
 ## 3 Long-horizon localization {#long-horizon-localization}
 @status Built and machine-verified. One frontier calibration episode, no training yet.
 
-We inject a fault into one package and allow the build to continue, so the visible failure surfaces later, up to fourteen packages downstream in the verified tasks. The agent is told nothing about where to look. Before a task counts, a machine check proves the injected fault causes the failure, patching where the failure surfaces does not repair it, and repairing the true cause does. Two candidates failed one proof and were removed, the checker filters rather than approves. Difficulty is an adjustable parameter, the same fault type passes at distance 5 and at distance 14, with 82 packages downstream available for expansion.
+We inject a fault into one package and allow the build to continue, so the visible failure surfaces later, up to fourteen packages downstream in the verified tasks. The agent is told nothing about where to look. Before a task counts, a machine check proves the injected fault causes the failure, patching where the failure surfaces does not repair it, and repairing the true cause does. Two candidates failed one proof and were removed, the checker filters rather than approves. Difficulty is an adjustable parameter, the same fault type passes at distance 5 and at distance 14, with 80 packages in the build sequence available for expansion.
 
 {{figure-3}}
 
-Claude Fable 5 has attempted one instance, the easiest, and solved it in 24 of the 40 permitted commands through genuine diagnosis, rebuilding the suspect library from clean source and comparing it byte by byte against the installed copy. Every episode here still opens by announcing that something is broken, which is what the model was always good at. The unannounced variants are the same unmeasured settings as in Figure&nbsp;1 and remain on the roadmap.
+Claude Fable 5 has attempted one instance, at distance 5, and solved it in 24 of the 40 permitted commands through genuine diagnosis, rebuilding the suspect library from clean source and comparing it byte by byte against the installed copy. Every episode here still opens by announcing that something is broken, which is what the model was always good at. The unannounced variants are the same unmeasured settings as in Figure&nbsp;1 and remain on the roadmap.
 
 @kick Environment 3 of 3
 ## 4 Ops-derived procedural tasks {#ops-derived-procedural-tasks}
