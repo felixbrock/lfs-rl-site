@@ -44,13 +44,14 @@
     border-top:2px solid var(--rule-strong);border-bottom:1px solid var(--rule-strong)}
 
   /* -- headline numbers ------------------------------------------------ */
-  .kpis{display:grid;grid-template-columns:repeat(4,1fr);gap:1rem;
+  .kpis{display:grid;grid-template-columns:repeat(5,1fr);gap:1rem;
     font-family:var(--sans);margin:0 0 2.2rem;padding:.9rem 0 .8rem;
     border-bottom:1px solid var(--rule)}
   .kpi .v{font-weight:600;font-size:1.45rem;line-height:1.15}
   .kpi .k{font-size:.66rem;letter-spacing:.05em;text-transform:uppercase;
     color:var(--ink-faint);line-height:1.5;margin-top:.15rem}
-  @media (max-width:34rem){.kpis{grid-template-columns:1fr 1fr;gap:.9rem 1rem}}
+  @media (max-width:34rem){.kpis{grid-template-columns:1fr 1fr;gap:.9rem 1rem}
+    .kpi:last-child:nth-child(odd){grid-column:1 / -1}}
 
   /* -- sections -------------------------------------------------------- */
   .kick{font-family:var(--sans);font-size:.66rem;letter-spacing:.16em;

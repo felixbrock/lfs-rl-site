@@ -1,10 +1,10 @@
   <figure class="fig" id="figure-2">
-    <figcaption class="cap"><b>Figure 2.</b> Share of problems fully solved at each training stage of one run (2026-07-30), four attempts per problem at temperature 0.7, "solved" means the repaired system runs, not merely builds. Gray bars, the 24 trained problems, red bars, 24 problems the model never saw, their repair target appears in no training example. Base bars are drawn at zero from 0 of 6 held-out problems at one attempt each and 0 of 26 on the earlier single-family cells, the base model has never solved a problem in any evaluation here. The warm-start-to-final step is a trend at this sample size. Every held-out pass was checked against its own transcript, the policy acted on the exact value its own check had surfaced.</figcaption>
+    <figcaption class="cap"><b>Figure 2.</b> After RL, 14 of 24 attempts on six problems the model never saw fully solved the problem, and 4 of those 6 problems were solved at least once, 3 of them in all four attempts. Bars show the share of attempts that fully solved the problem at each training stage of one run (2026-07-30), six problems per group, four attempts per problem at temperature 0.7, "solved" means the repaired system runs, not merely builds. Gray bars, six trained problems, red bars, six problems the model never saw, their repair target appears in no training example. Base bars are drawn at zero from 0 of 6 held-out problems at one attempt each and 0 of 26 attempts on the earlier single-family cells. The warm-start-to-final step is a trend at this sample size. Every held-out pass was checked against its own transcript, the policy acted on the exact value its own check had surfaced.</figcaption>
     <div class="leg">
-      <span><span class="sw" style="background:var(--ink-faint)"></span>Trained problems (24)</span>
-      <span><span class="sw" style="background:var(--accent)"></span>Held-out problems (24)</span>
+      <span><span class="sw" style="background:var(--ink-faint)"></span>Trained problems (6)</span>
+      <span><span class="sw" style="background:var(--accent)"></span>Held-out problems (6)</span>
     </div>
-    <svg viewBox="0 0 640 292" role="img" aria-label="Column chart. Trained problems, 0 percent base, 42 percent after supervised warm-start, 54 percent after GRPO. Held-out problems, 0, 33, and 58 percent.">
+    <svg viewBox="0 0 640 292" role="img" aria-label="Column chart, share of 24 attempts on six problems that fully solved the problem. Trained problems, 0 percent base, 42 percent after supervised warm-start, 54 percent after GRPO. Held-out problems, 0, 33, and 58 percent.">
       <line x1="40" y1="32"  x2="632" y2="32"  stroke="var(--rule)" stroke-width="1"/>
       <line x1="40" y1="106" x2="632" y2="106" stroke="var(--rule)" stroke-width="1"/>
       <line x1="40" y1="180" x2="632" y2="180" stroke="var(--rule)" stroke-width="1"/>
@@ -18,16 +18,16 @@
       <text class="val" x="152.7" y="247" text-anchor="middle">0%</text>
 
       <path d="M311,254 V102.6 Q311,98.6 315,98.6 H329 Q333,98.6 333,102.6 V254 Z" fill="var(--ink-faint)">
-        <title>Supervised warm-start, trained problems, 10 of 24 (42%)</title></path>
+        <title>Supervised warm-start, trained problems, 10 of 24 attempts (42%)</title></path>
       <path d="M339,254 V135.9 Q339,131.9 343,131.9 H357 Q361,131.9 361,135.9 V254 Z" fill="var(--accent)">
-        <title>Supervised warm-start, held-out problems, 8 of 24 (33%)</title></path>
+        <title>Supervised warm-start, held-out problems, 8 of 24 attempts (33%)</title></path>
       <text class="val" x="322" y="91.6" text-anchor="middle">42%</text>
       <text class="val" x="350" y="124.9" text-anchor="middle">33%</text>
 
       <path d="M508.3,254 V58.2 Q508.3,54.2 512.3,54.2 H526.3 Q530.3,54.2 530.3,58.2 V254 Z" fill="var(--ink-faint)">
-        <title>GRPO, trained problems, 13 of 24 (54%)</title></path>
+        <title>GRPO, trained problems, 13 of 24 attempts (54%)</title></path>
       <path d="M536.3,254 V43.4 Q536.3,39.4 540.3,39.4 H554.3 Q558.3,39.4 558.3,43.4 V254 Z" fill="var(--accent)">
-        <title>GRPO, held-out problems, 14 of 24 (58%)</title></path>
+        <title>GRPO, held-out problems, 14 of 24 attempts (58%)</title></path>
       <text class="val" x="519.3" y="47.2" text-anchor="middle">54%</text>
       <text class="val" x="547.3" y="32.4" text-anchor="middle">58%</text>
 
@@ -41,11 +41,11 @@
     <summary>Table view of Figure 2</summary>
     <div class="tabwrap">
       <table>
-        <thead><tr><th>Training stage</th><th class="num">Trained problems</th><th class="num">Held-out problems</th></tr></thead>
+        <thead><tr><th>Training stage</th><th class="num">Trained problems, solved attempts</th><th class="num">Held-out problems, solved attempts</th></tr></thead>
         <tbody>
           <tr><td>Base model, no training</td><td class="num">0 / 26 on the earlier single-family cells</td><td class="num">0 / 6, one attempt each</td></tr>
-          <tr><td>+ supervised warm-start (SFT)</td><td class="num">10 / 24 (42%)</td><td class="num">8 / 24 (33%)</td></tr>
-          <tr class="emph"><td>+ GRPO (RL)</td><td class="num"><span class="pass">13 / 24 (54%)</span></td><td class="num"><span class="pass">14 / 24 (58%)</span></td></tr>
+          <tr><td>+ supervised warm-start (SFT), 6 problems × 4 attempts</td><td class="num">10 / 24 (42%)</td><td class="num">8 / 24 (33%)</td></tr>
+          <tr class="emph"><td>+ GRPO (RL), 6 problems × 4 attempts</td><td class="num"><span class="pass">13 / 24 (54%)</span></td><td class="num"><span class="pass">14 / 24 (58%)</span></td></tr>
         </tbody>
       </table>
     </div>
