@@ -5,7 +5,7 @@
 <meta name="viewport" content="width=device-width,initial-scale=1">
 <meta name="color-scheme" content="light only">
 <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16'><text y='13' font-size='13'>%F0%9F%94%A7</text></svg>">
-<title>lfs-rl, verifiable debugging environments derived from Claude Fable 5 failures</title>
+<title>lfs-rl, verifiable debugging environments built around Claude Fable 5 failures</title>
 <meta name="description" content="An agent diagnoses and repairs a fault injected into a fully-built Linux system. The reward is a functional check run inside the repaired system, not a string match.">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -128,6 +128,8 @@
   @media (max-width:36rem){
     .lrow{grid-template-columns:1fr auto}
     .lrow .ll{grid-column:1 / -1;padding-top:.1rem}
+    .lrow > span:nth-child(2){white-space:nowrap}
+    .lrow .lc{white-space:normal}
   }
 
   /* -- count bars inside a ledger row (Figure 7) ------------------------ */
@@ -182,7 +184,7 @@
 
   <header>
     <div class="eyebrow">lfs-rl</div>
-    <h1>Verifiable debugging tasks for training and evaluating agents, derived from failures <strong>Claude Fable 5</strong> made in real operation.</h1>
+    <h1>Verifiable debugging tasks for training and evaluating agents, built around failures <strong>Claude Fable 5</strong> made in real operation.</h1>
     <p class="meta">Working document · September 2026</p>
     <div class="rule2"></div>
   </header>
@@ -366,9 +368,9 @@
   <h2 id="ops-derived-procedural-tasks"><span class="n">4</span>Ops-derived procedural tasks<a class="anchor" href="#ops-derived-procedural-tasks" aria-label="Link to this section">§</a></h2>
   <p class="status"><b>Status</b> &nbsp;Built and machine-verified. Thirty-one Claude Fable 5 episodes scored, two RL training updates run and measured on 2026-08-17.</p>
 
-  <p>This level is built from the real incident, nothing in it is artificially broken, the hazard is an old procedure meeting a changed world. In the <strong>live-install</strong> family, the agent holds an upgrade script written for a system under construction and must apply a security update to a system that is now live. Executed as written, the script replaces a library the running shell itself depends on, and partway through the replacement the system loses the ability to start a new process. The safe procedure, read the written guidance for this update, stage the new files beside the live ones, replace each with one atomic rename, in the correct order. In the <strong>false-failure</strong> family the trap is inverted, an upgrade succeeds and then reports failure because its verification step has a timing bug, and the agent must prove the system healthy instead of "fixing" it.</p>
+  <p>This level is built from the real incident, nothing in it is artificially broken, the hazard is an old procedure meeting a changed world. In the <strong>live-install</strong> family, the agent holds an upgrade script written for a system under construction and must apply a security update to that system after it went live. Executed as written, the script replaces a library the running shell itself depends on, and partway through the replacement the system loses the ability to start a new process. The safe procedure, read the written guidance for this update, stage the new files beside the live ones, replace each with one atomic rename, in the correct order. In the <strong>false-failure</strong> family the trap is inverted, an upgrade succeeds and then reports failure because its verification step has a timing bug, and the agent must prove the system healthy instead of "fixing" it.</p>
 
-  <p>The transcripts of the first no-signal run in Figure&nbsp;4 (3 of 5 reproduced) state why its failures occur. No failing agent read that guidance before acting, and both agents that held read it first. Each failure is a failure to route to the evidence, the skill in the opening table. Two clarifications, the reward scores prevention and recovery separately (the real incident was also recovered, recovery alone must not look like success), and one extra episode ended in a refusal over doubts about a file's origin, a reasonable outcome our grading cannot yet score, kept as an open design item.</p>
+  <p>The transcripts of the first no-signal run in Figure&nbsp;4 (3 of 5 reproduced) state why its failures occur. No failing agent read that guidance before acting, and both agents that held read it first. Each failure is a failure to route to the evidence, the skill in the opening table. Two clarifications, the reward scores prevention and recovery separately (the real incident was also recovered, recovery alone must not look like success), and one extra episode ended in a refusal over doubts about a file's origin, a reasonable outcome our grading does not score, kept as an open design item.</p>
 
   <figure class="fig" id="figure-4">
     <figcaption class="cap"><b>Figure 4.</b> Every scored Claude Fable 5 episode on this environment. Verdicts come from machine gates, a check after every command that the system can still start a process and a check of the preserved end state. The top three live-install rows predate the per-command check, so for them whether the system ever lost that ability comes from the retained command transcripts. No verdict comes from the agent's report. Hollow green, held. Solid red, incident reproduced.</figcaption>
@@ -665,7 +667,7 @@
 
   <h2 id="next-measurements"><span class="n">9</span>Next measurements<a class="anchor" href="#next-measurements" aria-label="Link to this section">§</a></h2>
 
-  <p>The roadmap follows directly from what the current numbers can and cannot yet say.</p>
+  <p>The roadmap follows directly from what the numbers in this report can and cannot say.</p>
 
   <dl class="spec">
     <dt>Wider arms</dt>

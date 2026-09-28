@@ -5,7 +5,7 @@
 <meta name="viewport" content="width=device-width,initial-scale=1">
 <meta name="color-scheme" content="light only">
 <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16'><text y='13' font-size='13'>%F0%9F%94%A7</text></svg>">
-<title>lfs-rl, verifiable debugging environments derived from Claude Fable 5 failures</title>
+<title>lfs-rl, verifiable debugging environments built around Claude Fable 5 failures</title>
 <meta name="description" content="An agent diagnoses and repairs a fault injected into a fully-built Linux system. The reward is a functional check run inside the repaired system, not a string match.">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -128,6 +128,8 @@
   @media (max-width:36rem){
     .lrow{grid-template-columns:1fr auto}
     .lrow .ll{grid-column:1 / -1;padding-top:.1rem}
+    .lrow > span:nth-child(2){white-space:nowrap}
+    .lrow .lc{white-space:normal}
   }
 
   /* -- count bars inside a ledger row (Figure 7) ------------------------ */
@@ -182,7 +184,7 @@
 
   <header>
     <div class="eyebrow">lfs-rl</div>
-    <h1>Verifiable debugging tasks for training and evaluating agents, derived from failures <strong>Claude Fable 5</strong> made in real operation.</h1>
+    <h1>Verifiable debugging tasks for training and evaluating agents, built around failures <strong>Claude Fable 5</strong> made in real operation.</h1>
     <p class="meta">Working document · September 2026</p>
     <div class="rule2"></div>
   </header>

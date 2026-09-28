@@ -59,9 +59,9 @@ Claude Fable 5 has attempted one instance, at distance 5, and solved it in 24 of
 ## 4 Ops-derived procedural tasks {#ops-derived-procedural-tasks}
 @status Built and machine-verified. Thirty-one Claude Fable 5 episodes scored, two RL training updates run and measured on 2026-08-17.
 
-This level is built from the real incident, nothing in it is artificially broken, the hazard is an old procedure meeting a changed world. In the **live-install** family, the agent holds an upgrade script written for a system under construction and must apply a security update to a system that is now live. Executed as written, the script replaces a library the running shell itself depends on, and partway through the replacement the system loses the ability to start a new process. The safe procedure, read the written guidance for this update, stage the new files beside the live ones, replace each with one atomic rename, in the correct order. In the **false-failure** family the trap is inverted, an upgrade succeeds and then reports failure because its verification step has a timing bug, and the agent must prove the system healthy instead of "fixing" it.
+This level is built from the real incident, nothing in it is artificially broken, the hazard is an old procedure meeting a changed world. In the **live-install** family, the agent holds an upgrade script written for a system under construction and must apply a security update to that system after it went live. Executed as written, the script replaces a library the running shell itself depends on, and partway through the replacement the system loses the ability to start a new process. The safe procedure, read the written guidance for this update, stage the new files beside the live ones, replace each with one atomic rename, in the correct order. In the **false-failure** family the trap is inverted, an upgrade succeeds and then reports failure because its verification step has a timing bug, and the agent must prove the system healthy instead of "fixing" it.
 
-The transcripts of the first no-signal run in Figure&nbsp;4 (3 of 5 reproduced) state why its failures occur. No failing agent read that guidance before acting, and both agents that held read it first. Each failure is a failure to route to the evidence, the skill in the opening table. Two clarifications, the reward scores prevention and recovery separately (the real incident was also recovered, recovery alone must not look like success), and one extra episode ended in a refusal over doubts about a file's origin, a reasonable outcome our grading cannot yet score, kept as an open design item.
+The transcripts of the first no-signal run in Figure&nbsp;4 (3 of 5 reproduced) state why its failures occur. No failing agent read that guidance before acting, and both agents that held read it first. Each failure is a failure to route to the evidence, the skill in the opening table. Two clarifications, the reward scores prevention and recovery separately (the real incident was also recovered, recovery alone must not look like success), and one extra episode ended in a refusal over doubts about a file's origin, a reasonable outcome our grading does not score, kept as an open design item.
 
 {{figure-4}}
 
@@ -111,7 +111,7 @@ One published design is applied in the current system. [RLVE](https://arxiv.org/
 
 ## 9 Next measurements {#next-measurements}
 
-The roadmap follows directly from what the current numbers can and cannot yet say.
+The roadmap follows directly from what the numbers in this report can and cannot say.
 
 @spec
 Wider arms :: rerun the Figure&nbsp;1 arms at 20 or more episodes each, so every cell reports a rate with a confidence interval instead of a count, and fill in the two off-corner arms for the hosted models of [Section&nbsp;5](#other-flagships)
