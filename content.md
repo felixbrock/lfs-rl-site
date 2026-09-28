@@ -12,7 +12,7 @@
 | <b>2</b>&ensp;medium | anywhere across 80 packages | the build fails at package&nbsp;9, the cause lies at package&nbsp;4 |
 | <b>3</b>&ensp;large | in the situation itself | the system is no longer the build environment the agent remembers, it is live production |
 
-Origin of the tasks. We ran Claude Fable 5 for several months as the administrator of a real Linux system and recorded every failure. Given a specific problem to repair, it almost always repaired it. What it missed was **noticing that something was wrong at all**. Every task below replays one of those recorded failures, and every task is graded by whether a real program, compiled and executed inside the repaired system, produces the correct output, no judge model, no answer string. A stub library that fakes the version string does not pass, an attack we implemented ourselves and every verifier rejects. The task texts, fixtures, and graders are deliberately unpublished, a public copy would enter future models' training data and turn this evaluation into a memory test.
+Origin of the tasks. We ran Claude Fable 5 for several months as the administrator of a real Linux system and recorded every failure ([Section&nbsp;6](#failure-log)). Given a specific problem to repair, it almost always repaired it. What it missed was **noticing that something was wrong at all**. Every task below replays one of those recorded failures, and every task is graded by whether a real program, compiled and executed inside the repaired system, produces the correct output, no judge model, no answer string. A stub library that fakes the version string does not pass, an attack we implemented ourselves and every verifier rejects. The task texts, fixtures, and graders are deliberately unpublished, a public copy would enter future models' training data and turn this evaluation into a memory test.
 
 **The central measured result.** We replayed the model's worst real incident as a controlled experiment, twenty-five fresh episodes on one exactly reproducible fault. Two signals could alert the model, a statement that the situation had changed, or a task that points at the hazard. With either signal present it never failed. With both absent, the hazard buried in a routine queue, it reproduced its own recorded incident (Figure&nbsp;1).
 
@@ -84,7 +84,19 @@ The two Anthropic models could not be measured, Anthropic's API-side safety filt
 
 Two caveats scope these numbers. The Figure&nbsp;1 episodes ran inside Claude's own agent product, the new models ran through a minimal text protocol, so rates compare within a model, not across models. Each arm holds 5 or 6 episodes. Pooled across both models the no-signal episodes (9 of 11 reproduced) span 48 to 98% at exact 95% confidence, the signal episodes (0 of 10) span 0 to 31%, and Hermes alone (22 to 96%) is too wide to support a claim on its own. The 21 episodes cost $4.45, the blocked Anthropic attempt roughly $11.
 
-## 6 Properties shared across the suite {#properties}
+@kick Task source
+## 6 Failures recorded in real operation {#failure-log}
+@status Classified. 108 logged failures in 19 failure modes, 2026-08-10 to 2026-09-28.
+
+The largest group of failures recorded in real operation is the routing failure this suite trains, 48 of 108 (Figure&nbsp;7). The agent that operates the real system writes one log entry per failure it makes there, with the root cause and the simple check that would have caught it, and a near-miss, a failure caught in review before it caused harm, receives an entry too. Four Claude models wrote the 108 entries, Fable&nbsp;5, Opus&nbsp;5, Fable&nbsp;5.1 and Opus&nbsp;5.5. Each entry was assigned to exactly one of 19 failure modes, and the modes fall into four groups. Two modes already have task families in [Section&nbsp;4](#ops-derived-procedural-tasks), the live-install incident and the false-failure verifier.
+
+{{figure-7}}
+
+Recording a failure did not prevent its recurrence. A process search that matched the shell running the search itself recurred six times after its first entry. Placing a file with no recorded checksum in a directory where every file must match one recurred four times. Each recurrence occurred with the first entry already in the log, and the operator's start-of-session procedure does not read the log. As in Figure&nbsp;1, the information that would have prevented the failure was on disk, and nothing prompted a read.
+
+These counts describe one log and are not rates. One annotator, the Claude Opus&nbsp;5.5 operator, assigned the modes from each entry's recorded root cause. No second annotator checked the assignment, so an entry near the boundary between two modes reflects one judgment. The four models operated in different periods on different work, so the log does not compare models.
+
+## 7 Properties shared across the suite {#properties}
 @spec
 Format :: the short-horizon level plugs into standard RL tooling (packaged as a `verifiers` environment) and has been run end to end against a live model
 Determinism :: the same seed reproduces the same fault and the same verifier
@@ -92,11 +104,11 @@ Cost :: what is shared is the substrate, every episode runs in the same rootless
 Isolation :: allow-list filesystem and private loopback-only network, verified by writing markers toward every host path from inside and confirming none arrived
 Scaling :: every fault type is written once and applied per package, so adding a new library means one small checking script and one list entry, the existing catalog applies unchanged
 
-## 7 Design basis {#design-basis}
+## 8 Design basis {#design-basis}
 
 One published design is applied in the current system. [RLVE](https://arxiv.org/abs/2511.07317) showed a learner needs tasks it sometimes solves and sometimes fails, and that principle produced the Figure&nbsp;5 result, the full incident task measured all-fail, so a reduced form was built until outcomes split. The substrate already restarts every episode from a cached snapshot and can fork the build at any package (verified). The two designs that would exploit this, [BPO](https://arxiv.org/abs/2607.14171)-style forked rollouts and [TRACE](https://arxiv.org/abs/2607.13988)-style per-step credit, are unimplemented roadmap items.
 
-## 8 Next measurements {#next-measurements}
+## 9 Next measurements {#next-measurements}
 
 The roadmap follows directly from what the current numbers can and cannot yet say.
 
@@ -107,7 +119,7 @@ Isolating self-distrust :: an arm where the only safety evidence is the model's 
 Training rigor :: repeat the Qwen run several times with different random seeds and several attempts per problem, reporting ranges in the style of [Agarwal et al., 2021](https://arxiv.org/abs/2108.13264), so seed variance is separated from the RL gain
 Prevention training :: continue the live-install GRPO program past its first two verified updates, more rounds and 20-plus-episode evals, until the brick-rate delta carries a confidence interval rather than a direction
 An external anchor :: select one external terminal-task benchmark on which the base 3B scores nonzero-but-low (a band test before any claim rides on it), run it at every training level, and pair it with a negative control on which the trained model must not improve
-Exam integrity :: training and exam material stay disjoint by incident, so mining new incidents from continuing operation is a standing prerequisite, the readline incident now carries training forms and only incidents free of them count as the exam
+Exam integrity :: training and exam material stay disjoint by incident, so mining new incidents from continuing operation ([Section&nbsp;6](#failure-log)) is a standing prerequisite, the readline incident now carries training forms and only incidents free of them count as the exam
 Forked rollouts (BPO) :: implement the training loop that forks an episode at a decision point and compares the siblings, the fork-native substrate is built and verified, the algorithm is not
 Per-step credit (TRACE) :: assign reward to individual commands from the per-step probe timeline instead of whole episodes, the adaptation is designed and the probe already records the needed signals
 Long-horizon settings :: score the distance-14 instance and the episode variants that never announce a fault, the settings [Section&nbsp;3](#long-horizon-localization) leaves unmeasured

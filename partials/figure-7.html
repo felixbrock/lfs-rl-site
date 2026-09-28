@@ -1,0 +1,139 @@
+  <figure class="fig" id="figure-7">
+    <figcaption class="cap"><b>Figure 7.</b> Of the 108 failures recorded in real operation from 2026-08-10 to 2026-09-28, the largest group, 48, is acting without reading the evidence that settles the question, the routing failure this suite trains. One bar per failure mode, bar length proportional to the count, red bars for that group and gray bars for the three other groups. Each failure carries exactly one of the 19 modes, assigned by one annotator from its recorded root cause. 62 of the 108 are near-misses, caught in review before they caused harm.</figcaption>
+    <div class="ledger">
+      <div class="lgroup">Acted without reading the deciding evidence &middot; 48</div>
+      <div class="lrow">
+        <span class="ll">Claim written without reading its source</span>
+        <span><span class="bar a" style="width:100.0%" aria-hidden="true"></span></span>
+        <span class="lc"><b>13</b></span>
+      </div>
+      <div class="lrow">
+        <span class="ll">Tool behavior assumed</span>
+        <span><span class="bar a" style="width:84.6%" aria-hidden="true"></span></span>
+        <span class="lc"><b>11</b></span>
+      </div>
+      <div class="lrow">
+        <span class="ll">Time or date estimated instead of read</span>
+        <span><span class="bar a" style="width:61.5%" aria-hidden="true"></span></span>
+        <span class="lc"><b>8</b></span>
+      </div>
+      <div class="lrow">
+        <span class="ll">Earlier check relied on as current</span>
+        <span><span class="bar a" style="width:46.2%" aria-hidden="true"></span></span>
+        <span class="lc"><b>6</b></span>
+      </div>
+      <div class="lrow">
+        <span class="ll">Path or URL typed from memory</span>
+        <span><span class="bar a" style="width:30.8%" aria-hidden="true"></span></span>
+        <span class="lc"><b>4</b></span>
+      </div>
+      <div class="lrow">
+        <span class="ll">Upstream security data trusted without the source</span>
+        <span><span class="bar a" style="width:30.8%" aria-hidden="true"></span></span>
+        <span class="lc"><b>4</b></span>
+      </div>
+      <div class="lrow">
+        <span class="ll">Build-time procedure run on the live system</span>
+        <span><span class="bar a" style="width:15.4%" aria-hidden="true"></span></span>
+        <span class="lc"><b>2</b></span>
+      </div>
+      <div class="lgroup">Checked, and the check misled &middot; 26</div>
+      <div class="lrow">
+        <span class="ll">Probe output mistaken for system state</span>
+        <span><span class="bar" style="width:69.2%" aria-hidden="true"></span></span>
+        <span class="lc"><b>9</b></span>
+      </div>
+      <div class="lrow">
+        <span class="ll">Partial evidence read as complete</span>
+        <span><span class="bar" style="width:61.5%" aria-hidden="true"></span></span>
+        <span class="lc"><b>8</b></span>
+      </div>
+      <div class="lrow">
+        <span class="ll">Observation altered its own evidence</span>
+        <span><span class="bar" style="width:38.5%" aria-hidden="true"></span></span>
+        <span class="lc"><b>5</b></span>
+      </div>
+      <div class="lrow">
+        <span class="ll">Check aimed at the wrong object</span>
+        <span><span class="bar" style="width:30.8%" aria-hidden="true"></span></span>
+        <span class="lc"><b>4</b></span>
+      </div>
+      <div class="lgroup">Agent-written scripts misbehaved &middot; 19</div>
+      <div class="lrow">
+        <span class="ll">Outcome check that cannot report the truth</span>
+        <span><span class="bar" style="width:53.8%" aria-hidden="true"></span></span>
+        <span class="lc"><b>7</b></span>
+      </div>
+      <div class="lrow">
+        <span class="ll">Scheduled run lost or marked done early</span>
+        <span><span class="bar" style="width:46.2%" aria-hidden="true"></span></span>
+        <span class="lc"><b>6</b></span>
+      </div>
+      <div class="lrow">
+        <span class="ll">Cleanup assumed complete</span>
+        <span><span class="bar" style="width:30.8%" aria-hidden="true"></span></span>
+        <span class="lc"><b>4</b></span>
+      </div>
+      <div class="lrow">
+        <span class="ll">Retry path never exercised</span>
+        <span><span class="bar" style="width:15.4%" aria-hidden="true"></span></span>
+        <span class="lc"><b>2</b></span>
+      </div>
+      <div class="lgroup">Procedure and record slips &middot; 15</div>
+      <div class="lrow">
+        <span class="ll">Close-out or follow-up omitted</span>
+        <span><span class="bar" style="width:38.5%" aria-hidden="true"></span></span>
+        <span class="lc"><b>5</b></span>
+      </div>
+      <div class="lrow">
+        <span class="ll">Unverified file placed in a checksum-gated directory</span>
+        <span><span class="bar" style="width:38.5%" aria-hidden="true"></span></span>
+        <span class="lc"><b>5</b></span>
+      </div>
+      <div class="lrow">
+        <span class="ll">Safety condition misframed</span>
+        <span><span class="bar" style="width:23.1%" aria-hidden="true"></span></span>
+        <span class="lc"><b>3</b></span>
+      </div>
+      <div class="lrow">
+        <span class="ll">Duplicated record left stale</span>
+        <span><span class="bar" style="width:15.4%" aria-hidden="true"></span></span>
+        <span class="lc"><b>2</b></span>
+      </div>
+    </div>
+  </figure>
+
+  <details>
+    <summary>Table view of Figure 7, with the definition of each mode</summary>
+    <div class="tabwrap">
+      <table>
+        <thead><tr><th>Failure mode</th><th>What occurred</th><th class="num">Failures</th><th class="num">Near-misses</th></tr></thead>
+        <tbody>
+          <tr class="emph"><td>Acted without reading the deciding evidence</td><td></td><td class="num">48</td><td class="num">30</td></tr>
+          <tr><td>Claim written without reading its source</td><td>A statement of fact written from reasoning, memory or the plan, with the source that settles it available and unread.</td><td class="num">13</td><td class="num">8</td></tr>
+          <tr><td>Tool behavior assumed</td><td>A flag, argument, syntax or default behavior of a command assumed from habit or from another tool.</td><td class="num">11</td><td class="num">8</td></tr>
+          <tr><td>Time or date estimated instead of read</td><td>A clock time, weekday or date window written from an estimate instead of the clock.</td><td class="num">8</td><td class="num">6</td></tr>
+          <tr><td>Earlier check relied on as current</td><td>A fact checked earlier, or inherited from an earlier session, relied on without a fresh check.</td><td class="num">6</td><td class="num">3</td></tr>
+          <tr><td>Path or URL typed from memory</td><td>A file path or download URL recalled instead of copied from the record that defines it.</td><td class="num">4</td><td class="num">4</td></tr>
+          <tr><td>Upstream security data trusted without the source</td><td>A release note, a vulnerability tracker field or a version status taken at face value, without reading the source code, the release page or the repository&rsquo;s own record.</td><td class="num">4</td><td class="num">0</td></tr>
+          <tr><td>Build-time procedure run on the live system</td><td>A procedure written for the build environment executed on the live system, the incident of Section&nbsp;4 among them.</td><td class="num">2</td><td class="num">1</td></tr>
+          <tr class="emph"><td>Checked, and the check misled</td><td></td><td class="num">26</td><td class="num">21</td></tr>
+          <tr><td>Probe output mistaken for system state</td><td>A process search matched the shell that ran it, or a line count included the tool&rsquo;s own message for an empty result.</td><td class="num">9</td><td class="num">8</td></tr>
+          <tr><td>Partial evidence read as complete</td><td>A partial view taken as the whole answer, for example a truncated output, a view without root access, or one of two crash-report stores.</td><td class="num">8</td><td class="num">6</td></tr>
+          <tr><td>Observation altered its own evidence</td><td>A step meant only to observe changed or destroyed the evidence that a later check reads.</td><td class="num">5</td><td class="num">3</td></tr>
+          <tr><td>Check aimed at the wrong object</td><td>The check read a different process, window or environment than the one in question.</td><td class="num">4</td><td class="num">4</td></tr>
+          <tr class="emph"><td>Agent-written scripts misbehaved</td><td></td><td class="num">19</td><td class="num">4</td></tr>
+          <tr><td>Outcome check that cannot report the truth</td><td>An outcome check that fails on success, can never fail, or does not cover the changed item, the false-failure family of Section&nbsp;4 among them.</td><td class="num">7</td><td class="num">2</td></tr>
+          <tr><td>Scheduled run lost or marked done early</td><td>A scheduled routine lost its run, or recorded a run as complete that never completed.</td><td class="num">6</td><td class="num">0</td></tr>
+          <tr><td>Cleanup assumed complete</td><td>A cleanup step assumed its file inventory was complete, and superseded files survived.</td><td class="num">4</td><td class="num">0</td></tr>
+          <tr><td>Retry path never exercised</td><td>A step claimed to be safe to re-run, and a re-run would have duplicated state or failed.</td><td class="num">2</td><td class="num">2</td></tr>
+          <tr class="emph"><td>Procedure and record slips</td><td></td><td class="num">15</td><td class="num">7</td></tr>
+          <tr><td>Close-out or follow-up omitted</td><td>A required record, tracking item or follow-up left undone at the end of a session.</td><td class="num">5</td><td class="num">0</td></tr>
+          <tr><td>Unverified file placed in a checksum-gated directory</td><td>A file with no recorded checksum placed in a directory where every file must match one, so the checksum check stops the whole batch.</td><td class="num">5</td><td class="num">4</td></tr>
+          <tr><td>Safety condition misframed</td><td>A safety condition for deleting a rollback snapshot, written or checked against a different question than the one it guards.</td><td class="num">3</td><td class="num">3</td></tr>
+          <tr><td>Duplicated record left stale</td><td>A fact kept in two places and updated in only one.</td><td class="num">2</td><td class="num">0</td></tr>
+          <tr class="emph"><td>All modes</td><td></td><td class="num">108</td><td class="num">62</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </details>
